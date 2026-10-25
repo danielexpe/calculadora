@@ -9,7 +9,7 @@
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
 3. Verificar `git status` — repositório local em `main`, commits `ed07e19`,
-   `7923129` e `f691b0c`. Não criar novo commit, push, tag ou release sem
+   `7923129`, `f691b0c` e `ab0dd65`. Não criar novo commit, push, tag ou release sem
    pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
 5. Não iniciar fase sem pedido explícito; as Fases 0–3 estão concluídas no
@@ -31,8 +31,8 @@
 | Fase 4 — Acabamento | pendente |
 | Fase 5 — Release | pendente |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
-| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c` |
-| Commits/releases | 3 commits locais (`ed07e19`, `7923129`, `f691b0c`); nenhum push/release |
+| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65` |
+| Commits/releases | 4 commits locais (`ed07e19`, `7923129`, `f691b0c`, `ab0dd65`); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -203,7 +203,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 1: domínio decimal/calculator/history, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados | `Cargo.toml`, `Cargo.lock`, `src/**`, `tests/**`, `xtask/**`, `assets/**`, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `ed07e19` |
 | 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `f691b0c` |
 | 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | `f691b0c` |
-| 2026-10-25 | Fase 3: `App` (input→cálculo→cena, histórico/recall, flash, debounce), marcador de som, rolagem da fita, 16 capturas douradas, testes PTY/sinais e README atualizado; 182 testes ativos + 2 auxiliares | `src/app.rs`, `src/input.rs`, `src/capture.rs`, `src/render/scene.rs`, `src/render/layout.rs`, `tests/golden.rs`, `tests/pty_guard.rs`, `tests/signals.rs`, `tests/snapshots/**`, `README.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Fase 3: `App` (input→cálculo→cena, histórico/recall, flash, debounce), marcador de som, rolagem da fita, 16 capturas douradas, testes PTY/sinais e README atualizado; 182 testes ativos + 2 auxiliares | `src/app.rs`, `src/input.rs`, `src/capture.rs`, `src/render/scene.rs`, `src/render/layout.rs`, `tests/golden.rs`, `tests/pty_guard.rs`, `tests/signals.rs`, `tests/snapshots/**`, `README.md`, `docs/**`, `AGENTS.md` | `ab0dd65` |
 
 ## 11. Fases
 
