@@ -8,9 +8,9 @@
 
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
-3. Verificar `git status` — repositório local em `main`, commits `ed07e19`,
-   `7923129`, `f691b0c`, `ab0dd65` e `ac97f03`. Não criar novo commit, push,
-   tag ou release sem pedido explícito.
+3. Verificar `git status` — repositório local em `main`; último commit de
+   feature `73eac45`. Não criar novo commit, push, tag ou release sem pedido
+   explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
 5. Não iniciar fase sem pedido explícito; as Fases 0–5 estão concluídas no
    escopo local. Detalhes manuais, 24/16 bpp e release público pendentes.
@@ -34,8 +34,8 @@
 | Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
 | SHA-256 do pacote | `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023` |
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
-| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65`, `ac97f03` |
-| Commits/releases | 6 commits locais (4 de feature + 2 de registro); nenhum push/release |
+| Repositório git | inicializado em `main`; último commit de feature `73eac45` |
+| Commits/releases | 8 commits locais (5 de feature + 3 de registro); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -213,7 +213,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 4: áudio sintetizado + ALSA dinâmico (feature audio), fade de 120 ms, contraste/paletas corrigidos, compositor com fundo em cache, 16 douradas regeneradas e README/docs atualizados; 194 testes ativos + 2 auxiliares | `src/audio.rs`, `src/platform/audio.rs`, `src/app.rs`, `src/theme.rs`, `src/render/fb.rs`, `src/render/scene.rs`, `tests/cli_process.rs`, `tests/snapshots/**`, `Cargo.toml`, `README.md`, `docs/**`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | `ac97f03` |
-| 2026-10-25 | Fase 5 local: versão 1.0.0, RELEASE_NOTES, checklist, pacote tar.gz + sha256, smoke em /tmp sem assets; sem tag/push | `Cargo.toml`, `Cargo.lock`, `RELEASE_NOTES.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Fase 5 local: versão 1.0.0, RELEASE_NOTES, checklist, pacote tar.gz + sha256, smoke em /tmp sem assets; sem tag/push | `Cargo.toml`, `Cargo.lock`, `RELEASE_NOTES.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | `73eac45` |
 
 ## 11. Fases
 
