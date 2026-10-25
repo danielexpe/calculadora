@@ -36,7 +36,7 @@ pub fn map_key(key: KeyEvent) -> Action {
         return Action::Ignored;
     }
 
-    match key.code {
+    let action = match key.code {
         KeyCode::Esc => Action::Quit,
         KeyCode::Enter => Action::Equals,
         KeyCode::Backspace => Action::Backspace,
@@ -46,7 +46,18 @@ pub fn map_key(key: KeyEvent) -> Action {
         KeyCode::F(2) => Action::ToggleLanguage,
         KeyCode::Char(character) => map_character(character),
         _ => Action::Ignored,
+    };
+
+    if key.kind == KeyEventKind::Repeat
+        && !matches!(
+            action,
+            Action::Digit(_) | Action::Backspace | Action::HistoryPrev | Action::HistoryNext
+        )
+    {
+        return Action::Ignored;
     }
+
+    action
 }
 
 fn map_character(character: char) -> Action {
@@ -142,6 +153,63 @@ mod tests {
         assert_eq!(
             map_key(KeyEvent::new(KeyCode::Char('c'), KeyModifiers::CONTROL)),
             Action::Quit
+        );
+    }
+
+    #[test]
+    fn repeat_is_limited_to_editing_and_history_keys() {
+        let repeat = |code| KeyEvent::new_with_kind(code, KeyModifiers::NONE, KeyEventKind::Repeat);
+        assert_eq!(
+            repeat(KeyCode::Char('7')),
+            KeyEvent::new_with_kind(KeyCode::Char('7'), KeyModifiers::NONE, KeyEventKind::Repeat)
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Char('7'),
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::Digit('7')
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Backspace,
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::Backspace
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Up,
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::HistoryPrev
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Enter,
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::Ignored
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Char('+'),
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::Ignored
+        );
+        assert_eq!(
+            map_key(KeyEvent::new_with_kind(
+                KeyCode::Char('c'),
+                KeyModifiers::NONE,
+                KeyEventKind::Repeat
+            )),
+            Action::Ignored
         );
     }
 

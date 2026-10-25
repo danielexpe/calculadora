@@ -95,7 +95,10 @@ assets/
 xtask/
   src/main.rs        # valida assets, manifesto, --check
 tests/
-  snapshots/         # PNGs dourados / hashes RGBA
+  golden.rs          # comparação RGBA contra PNGs dourados
+  pty_guard.rs       # restauração de raw mode em PTY
+  signals.rs         # flag de SIGTERM em processo filho
+  snapshots/         # 16 PNGs dourados (1344 × 756)
 .cargo/
   config.toml        # alias: xtask = run --package xtask --
 .gitignore           # target/, dist/, pacotes de release
@@ -128,8 +131,8 @@ xtask = "run --package xtask --"
 | `render/` (scene, layout, text, blend, fb) | implementado na Fase 2 |
 | `platform/fb.rs` (ABI, mmap, console, sinais) | implementado na Fase 2 |
 | `capture.rs` (PNG 1344 × 756 determinístico) | implementado na Fase 2 |
-| `app.rs` (loop fb, idioma, som, saída) | parcial: cena estática; fluxo de cálculo na Fase 3 |
-| `main.rs` | capture e runtime fb ligados; códigos 0/1/3 |
+| `app.rs` (`App` puro + loop fb, flash, debounce, histórico, saída) | implementado na Fase 3 |
+| `main.rs` | capture e runtime fb ligados; códigos 0/1/2/3 |
 | `audio.rs` | Fase 4 |
 
 ## 4. Dependências

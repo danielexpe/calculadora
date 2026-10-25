@@ -12,7 +12,7 @@
 | 0 — Descoberta | congelar escopo, regras e riscos | docs 01–08 + AGENTS.md |
 | 1 — Fundação | domínio puro, CLI, i18n, entrada | cálculo testado, `--capture-frame` ainda não |
 | 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25); VT pendente |
-| 3 — Fluxo funcional | UI completa, input loop, histórico | fluxo completo + capturas douradas |
+| 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída (headless)**; VT pendente |
 | 4 — Acabamento | tema, som, a11y, desempenho | polimento e orçamentos medidos |
 | 5 — Release v1.0 | validação em VT, pacote, docs | pacote + smoke test |
 | 6 — Backlog | TUI, DRM/KMS, persistência | priorizado pelo usuário |
@@ -114,7 +114,7 @@ Critérios de saída:
 Evidência headless: captura determinística, 154 testes unitários + 8 de
 processo + 1 do xtask; ver `docs/10-validation-log.md`.
 
-## Fase 3 — Fluxo funcional
+## Fase 3 — Fluxo funcional (concluída em 2026-10-25 no headless)
 
 **Escopo:** ligar input → domínio → UI → fb; histórico e interação completos.
 
@@ -133,13 +133,20 @@ Tarefas:
 
 Critérios de saída:
 
-- [ ] Fluxo completo em 32 bpp no VT (ou bloqueio explícito).
-- [ ] Todas as capturas de `docs/05` aprovadas.
-- [ ] `Ctrl+C`/`SIGTERM`/`SIGHUP`/panic restauram console.
-- [ ] Histórico navegável e recall sem criar entrada.
-- [ ] Percentual e erros conforme `docs/01`.
-- [ ] `fmt`, `clippy`, `test` (com/sem features) verdes.
-- [ ] Nenhum log na tela; erros após restauração.
+- [ ] Fluxo completo em 32 bpp no VT **ou** bloqueio registrado. **Pendente:**
+  P-01/P-02 (grupo `video` e VT livre); código testado apenas no headless.
+- [x] Todas as capturas de `docs/05` aprovadas: 16 PNGs em `tests/snapshots/`.
+- [x] `Ctrl+C` mapeado para `Quit`; raw mode restaurado em PTY; `SIGTERM`
+  marca a flag em teste de processo. Restauração visual de `KD_TEXT`/cursor
+  em VT real segue **pendente**.
+- [x] Histórico navegável e recall sem criar entrada.
+- [x] Percentual e erros conforme `docs/01`.
+- [x] `fmt`, `clippy`, `test` (com/sem features) verdes.
+- [x] Nenhum log na tela; erros após restauração.
+
+Evidência headless: 16 capturas douradas, testes de `App` (flash, debounce,
+seleção/recall), PTY de raw mode e flag de `SIGTERM`; ver
+`docs/10-validation-log.md`.
 
 ## Fase 4 — Acabamento
 

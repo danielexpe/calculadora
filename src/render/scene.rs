@@ -277,7 +277,7 @@ pub fn calculator_scene(view: &CalculatorView<'_>) -> Scene {
         align: Align::Left,
     });
     scene.text(Text {
-        x: 1064.0,
+        x: layout::LANGUAGE_CHIP_X,
         y: layout::FOOTER_Y,
         w: 24.0,
         h: layout::FOOTER_H,
@@ -290,10 +290,11 @@ pub fn calculator_scene(view: &CalculatorView<'_>) -> Scene {
         color: theme.text_secondary,
         align: Align::Left,
     });
+    sound_marker(&mut scene, theme, view.sound);
     scene.text(Text {
-        x: 1092.0,
+        x: layout::SOUND_TEXT_X,
         y: layout::FOOTER_Y,
-        w: 148.0,
+        w: layout::SOUND_TEXT_W,
         h: layout::FOOTER_H,
         text: sound_status(view.lang, view.sound).to_string(),
         font: FontKind::InterRegular,
@@ -303,6 +304,46 @@ pub fn calculator_scene(view: &CalculatorView<'_>) -> Scene {
     });
 
     scene
+}
+
+fn sound_marker(scene: &mut Scene, theme: &Theme, status: SoundStatus) {
+    let x = layout::SOUND_MARKER_X;
+    let y = layout::SOUND_MARKER_Y;
+    let size = layout::SOUND_MARKER_SIZE;
+
+    match status {
+        SoundStatus::On => scene.rect(Rect {
+            x,
+            y,
+            w: size,
+            h: size,
+            radius: size / 2.0,
+            fill: theme.success,
+            stroke: None,
+            shadow: false,
+        }),
+        SoundStatus::Off => scene.rect(Rect {
+            x,
+            y,
+            w: size,
+            h: size,
+            radius: size / 2.0,
+            fill: Rgba8::TRANSPARENT,
+            stroke: Some(Stroke {
+                color: theme.text_secondary,
+                width: 1.5,
+            }),
+            shadow: false,
+        }),
+        SoundStatus::Unavailable => scene.line(Line {
+            x1: x,
+            y1: y + size / 2.0,
+            x2: x + size,
+            y2: y + size / 2.0,
+            width: 2.0,
+            color: theme.text_secondary,
+        }),
+    }
 }
 
 fn history(scene: &mut Scene, view: &CalculatorView<'_>) {
@@ -327,14 +368,19 @@ fn history(scene: &mut Scene, view: &CalculatorView<'_>) {
     }
 
     let len = view.history.len();
-    let visible = len.min(layout::HISTORY_VISIBLE);
-    let first = len - visible;
+    let selection = view.selection.filter(|index| *index < len);
+    let visible = layout::HISTORY_VISIBLE;
+    let end = match selection {
+        Some(index) => (index + 1).max(visible).min(len),
+        None => len,
+    };
+    let start = end.saturating_sub(visible);
 
-    for (slot, index) in (first..len).enumerate() {
-        let row = slot + layout::HISTORY_VISIBLE - visible;
+    for index in start..end {
+        let row = index - start;
         let y = area_y + row as f32 * layout::HISTORY_ROW_H;
         let entry = view.history.get(index).expect("history index in range");
-        let selected = view.selection == Some(index);
+        let selected = selection == Some(index);
 
         if selected {
             scene.rect(Rect {
@@ -418,17 +464,7 @@ fn keypad(scene: &mut Scene, view: &CalculatorView<'_>, theme: &Theme) {
 }
 
 fn key_style(id: KeyId, pressed: bool, theme: &Theme) -> (Rgba8, Rgba8, Rgba8, FontKind, f32) {
-    if pressed {
-        return (
-            theme.key_pressed,
-            theme.accent_strong,
-            theme.text_primary,
-            FontKind::MonoMedium,
-            30.0,
-        );
-    }
-
-    match id {
+    let (fill, stroke, color, font, size) = match id {
         KeyId::Equals => (
             theme.accent,
             theme.accent,
@@ -443,21 +479,7 @@ fn key_style(id: KeyId, pressed: bool, theme: &Theme) -> (Rgba8, Rgba8, Rgba8, F
             FontKind::MonoMedium,
             32.0,
         ),
-        KeyId::Digit(_) => (
-            theme.key,
-            theme.border,
-            theme.text_primary,
-            FontKind::MonoMedium,
-            30.0,
-        ),
-        KeyId::DecimalSeparator => (
-            theme.key,
-            theme.border,
-            theme.text_primary,
-            FontKind::MonoMedium,
-            30.0,
-        ),
-        KeyId::ToggleSign => (
+        KeyId::Digit(_) | KeyId::DecimalSeparator | KeyId::ToggleSign => (
             theme.key,
             theme.border,
             theme.text_primary,
@@ -485,6 +507,17 @@ fn key_style(id: KeyId, pressed: bool, theme: &Theme) -> (Rgba8, Rgba8, Rgba8, F
             FontKind::InterSemiBold,
             22.0,
         ),
+    };
+
+    if pressed {
+        let color = if id == KeyId::Equals {
+            theme.text_primary
+        } else {
+            color
+        };
+        (theme.key_pressed, theme.accent_strong, color, font, size)
+    } else {
+        (fill, stroke, color, font, size)
     }
 }
 
@@ -558,7 +591,7 @@ mod tests {
             .iter()
             .filter(|item| matches!(item, Item::Text(_)))
             .count();
-        assert_eq!(rects, 2 + 1 + 20);
+        assert_eq!(rects, 2 + 1 + 20 + 1);
         assert!(texts > 23);
         assert!(scene.items.iter().any(|item| matches!(
             item,
@@ -623,6 +656,57 @@ mod tests {
             .items
             .iter()
             .any(|item| matches!(item, Item::Text(Text { text, .. }) if text == "5")));
+    }
+
+    #[test]
+    fn sound_marker_does_not_depend_on_color_alone() {
+        let theme = Theme::truecolor();
+        let history = History::new();
+        let mut view = view(&theme, &history);
+
+        view.sound = SoundStatus::On;
+        let on = calculator_scene(&view);
+        assert!(on.items.iter().any(|item| matches!(
+            item,
+            Item::Rect(rect) if rect.fill == theme.success && rect.stroke.is_none()
+        )));
+
+        view.sound = SoundStatus::Off;
+        let off = calculator_scene(&view);
+        assert!(off.items.iter().any(|item| matches!(
+            item,
+            Item::Rect(rect) if rect.fill == Rgba8::TRANSPARENT && rect.stroke.is_some()
+        )));
+
+        view.sound = SoundStatus::Unavailable;
+        let unavailable = calculator_scene(&view);
+        assert!(unavailable
+            .items
+            .iter()
+            .any(|item| matches!(item, Item::Line(line) if line.width == 2.0)));
+    }
+
+    #[test]
+    fn history_window_follows_selection() {
+        let theme = Theme::truecolor();
+        let mut calculator = Calculator::new();
+        for index in 0..15 {
+            for digit in (index + 1).to_string().chars() {
+                calculator.handle(crate::core::CalcAction::Digit(digit));
+            }
+            calculator.handle(crate::core::CalcAction::Operator(
+                crate::core::Operator::Add,
+            ));
+            calculator.handle(crate::core::CalcAction::Digit('1'));
+            calculator.handle(crate::core::CalcAction::Equals);
+        }
+        let mut view = view(&theme, calculator.history());
+        view.selection = Some(0);
+        let scene = calculator_scene(&view);
+        assert!(scene.items.iter().any(|item| matches!(
+            item,
+            Item::Text(text) if text.text == "1 + 1 ="
+        )));
     }
 
     #[test]

@@ -5,12 +5,10 @@ use std::path::PathBuf;
 use thiserror::Error;
 use tiny_skia::Pixmap;
 
+use crate::app::App;
 use crate::cli::Cli;
-use crate::core::Calculator;
-use crate::i18n::SoundStatus;
 use crate::render::fb::{capture_frame, straight_rgba};
 use crate::render::layout::{CANVAS_H, CANVAS_W};
-use crate::render::scene::{calculator_scene, CalculatorView};
 use crate::render::text::TextEngine;
 use crate::theme::Theme;
 
@@ -44,33 +42,15 @@ pub struct CaptureInfo {
 pub fn render_capture(cli: &Cli) -> Result<Pixmap, CaptureError> {
     let engine = TextEngine::new().map_err(CaptureError::Fonts)?;
     let theme = Theme::new(cli.effective_color_from_env(), 32);
-    let calculator = Calculator::new();
-    let locale = cli.lang.number_locale();
-    let sound = if cli.no_audio {
-        SoundStatus::Off
-    } else {
-        SoundStatus::On
-    };
+    let app = App::new(cli.lang, cli.no_audio, !cli.no_animations);
+    Ok(render_frame(&app, &theme, &engine))
+}
 
-    let view = CalculatorView {
-        lang: cli.lang,
-        theme: &theme,
-        display: calculator.display(locale),
-        expression: calculator.expression(locale),
-        history: calculator.history(),
-        selection: None,
-        sound,
-        pressed: None,
-    };
-
-    let pixmap = capture_frame(&calculator_scene(&view), &engine);
-    if pixmap.width() != CANVAS_W || pixmap.height() != CANVAS_H {
-        return Err(CaptureError::Geometry {
-            width: pixmap.width(),
-            height: pixmap.height(),
-        });
-    }
-    Ok(pixmap)
+pub fn render_frame(app: &App, theme: &Theme, engine: &TextEngine) -> Pixmap {
+    let pixmap = capture_frame(&app.scene(theme), engine);
+    debug_assert_eq!(pixmap.width(), CANVAS_W);
+    debug_assert_eq!(pixmap.height(), CANVAS_H);
+    pixmap
 }
 
 pub fn write_frame(cli: &Cli) -> Result<CaptureInfo, CaptureError> {

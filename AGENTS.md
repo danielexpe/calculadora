@@ -8,12 +8,12 @@
 
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
-3. Verificar `git status` — repositório local inicializado em 2026-10-25 na
-   branch `main`, com commit inicial `ed07e19`. Não criar novo commit, push,
-   tag ou release sem pedido explícito.
+3. Verificar `git status` — repositório local em `main`, commits `ed07e19`,
+   `7923129` e `f691b0c`. Não criar novo commit, push, tag ou release sem
+   pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
-5. Não iniciar fase sem pedido explícito; as Fases 0, 1 e 2 estão concluídas
-   (a Fase 2 só no caminho headless; VT pendente).
+5. Não iniciar fase sem pedido explícito; as Fases 0–3 estão concluídas no
+   caminho headless (VT/hardware pendente).
 
 ## 2. Status atual
 
@@ -22,17 +22,17 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–2 implementadas; runtime fb estático; fluxo de cálculo na Fase 3 |
+| Código de produção | Fases 1–3 implementadas; fluxo completo no headless; áudio na Fase 4 |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
 | Fase 2 — Substrato fb | **concluída no headless** (2026-10-25); VT/fb real pendente |
-| Testes | 163 verdes (154 unitários + 8 processo + 1 xtask) |
-| Captura PNG | **implementada**: 1344 × 756 determinística, ~40 ms |
-| Fase 3 — Fluxo funcional | pendente (não iniciar sem pedido) |
+| Testes | 182 ativos verdes (170 unitários + 8 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
+| Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
+| Fase 3 — Fluxo funcional | **concluída no headless** (2026-10-25); VT pendente |
 | Fase 4 — Acabamento | pendente |
 | Fase 5 — Release | pendente |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
-| Repositório git | inicializado em `main`; commits `ed07e19` e `7923129` |
-| Commits/releases | 2 commits locais (`ed07e19`, `7923129`); nenhum push/release |
+| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c` |
+| Commits/releases | 3 commits locais (`ed07e19`, `7923129`, `f691b0c`); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -108,7 +108,7 @@ adicionados. Bloqueios de hardware não podem ser declarados validados.
 
 ## 7. Comandos e portões
 
-Portões atuais (Fase 2 verde):
+Portões atuais (Fase 3 verde):
 
 ```bash
 cargo fmt --all -- --check
@@ -121,11 +121,15 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
-QA sem hardware (implementado na Fase 2):
+QA sem hardware (Fases 2–3):
 
 ```bash
 ./target/release/calculadora --capture-frame /tmp/calculadora.png
 # esperado: PNG 1344x756 determinístico, ~40 ms, sem abrir fb/tty/áudio
+cargo test --test golden
+# compara 16 estados por RGBA; regenerar: UPDATE_SNAPSHOTS=1 cargo test --test golden
+cargo test --test pty_guard --test signals
+# raw mode em PTY e flag de SIGTERM (processos filhos)
 ```
 
 Validação em VT (ainda bloqueada por P-01/P-02):
@@ -145,10 +149,11 @@ Ambiente auditado em 2026-10-25:
 - Sessão atual em Wayland no tty2; `/dev/tty` não é TTY no shell atual.
 - `rust_decimal` 1.43.0 baixada e pinada no `Cargo.lock`.
 - Fontes Inter 4.1 e JetBrains Mono 2.304 baixadas, com hashes registrados.
-- Fase 2 implementada: fbdev, console/sinais, tema, cena/texto, captura PNG e
-  app estático. Binário release ~3,4 MB.
-- Áudio ainda não implementado; fluxo completo de cálculo fica na Fase 3.
-- Captura PNG validada; execução em VT real **não** validada.
+- Fases 2–3 implementadas: fbdev, console/sinais, tema, cena/texto, captura,
+  `App` completo, flash/debounce, histórico/recall e 16 capturas douradas.
+  Binário release ~3,4 MB.
+- Áudio e fade de histórico ficam na Fase 4.
+- Fluxo e capturas validados no headless; execução em VT real **não** validada.
 
 ## 8. Regras de trabalho do agente
 
@@ -196,8 +201,9 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 0: criados README, docs 01–10 e AGENTS.md; decisões e riscos congelados; nenhum código | `README.md`, `docs/*`, `AGENTS.md` | `ed07e19` |
 | 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado | `.gitignore`, `AGENTS.md`, `docs/10-validation-log.md` | `ed07e19` |
 | 2026-10-25 | Fase 1: domínio decimal/calculator/history, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados | `Cargo.toml`, `Cargo.lock`, `src/**`, `tests/**`, `xtask/**`, `assets/**`, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `ed07e19` |
-| 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
-| 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `f691b0c` |
+| 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | `f691b0c` |
+| 2026-10-25 | Fase 3: `App` (input→cálculo→cena, histórico/recall, flash, debounce), marcador de som, rolagem da fita, 16 capturas douradas, testes PTY/sinais e README atualizado; 182 testes ativos + 2 auxiliares | `src/app.rs`, `src/input.rs`, `src/capture.rs`, `src/render/scene.rs`, `src/render/layout.rs`, `tests/golden.rs`, `tests/pty_guard.rs`, `tests/signals.rs`, `tests/snapshots/**`, `README.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
 
 ## 11. Fases
 
@@ -206,21 +212,21 @@ Não registrar segredos. Não inventar progresso.
 | 0 | especificação e planejamento | concluída |
 | 1 | fundação pura, CLI, i18n, input, testes | **concluída** |
 | 2 | fbdev, console, texto, cena, captura | **concluída (headless)**; VT pendente |
-| 3 | fluxo completo, histórico, capturas douradas | pendente |
+| 3 | fluxo completo, histórico, capturas douradas | **concluída (headless)**; VT pendente |
 | 4 | tema, som, a11y, desempenho | pendente |
 | 5 | validação em VT, pacote, docs | pendente |
 | 6 | backlog (TUI, DRM/KMS, persistência) | não iniciado |
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1 e 2 estão concluídas no que é testável sem hardware. Aguardar
-  pedido explícito para iniciar a Fase 3 (ligar input → cálculo → cena,
-  histórico, `F2`/`M`, debounce e capturas douradas).
+- As Fases 1–3 estão concluídas no que é testável sem hardware. Aguardar
+  pedido explícito para iniciar a Fase 4 (áudio ALSA, fade de histórico,
+  paletas 256/16/mono ponta a ponta, a11y e desempenho).
 - Antes de validar em fb: confirmar P-01/P-02 com o usuário.
-- O `app.rs` atual desenha a cena estática e trata `Q`/`Esc`/`Ctrl+C`, `F2` e
-  `M`; ações de cálculo são ignoradas até a Fase 3.
-- Criar as capturas douradas em `tests/snapshots/` na Fase 3, reutilizando
-  `capture::render_capture` e comparação de RGBA.
+- O `app.rs` atual tem `App` puro + loop fb; cálculo, histórico/recall, `F2`,
+  `M`, flash de 90 ms e debounce de 120 ms já estão ligados.
+- Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;
+  regenerar com `UPDATE_SNAPSHOTS=1 cargo test --test golden` e revisar.
 - Em VT, validar 32 bpp primeiro; registrar 24/16 bpp como pendentes se não
   houver hardware. Nada de declarar validação sem executar.
 - Qualquer mudança de comportamento deve atualizar `docs/01`, `docs/05` e as

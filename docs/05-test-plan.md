@@ -135,59 +135,60 @@ Tabela mínima:
 - [x] `Q`/`Esc`/`Ctrl+C` → `Quit`.
 - [x] `KeyEventKind::Release` ignorado.
 - [x] Teclas desconhecidas ignoradas sem som/erro.
-- [ ] Ações globais têm prioridade sobre a tela.
-- [ ] Debounce de `=`/`Enter` em 120 ms; dígitos não têm debounce.
-- [ ] Clique de tecla física dispara flash da tecla correspondente.
+- [x] Ações globais têm prioridade sobre a tela.
+- [x] Debounce de `=`/`Enter` em 120 ms; dígitos não têm debounce.
+- [x] Clique de tecla física dispara flash da tecla correspondente.
+- [x] Repetição automática só para dígitos, `Backspace` e histórico.
 
 ## 5. Renderização sem hardware
 
 ### 5.1 Framebuffer
 
-- [ ] `fb_var_screeninfo` = 160 bytes; `fb_fix_screeninfo` = 80 bytes.
-- [ ] Parse de 32 bpp RGBX/BGRX/XRGB/XBGR.
-- [ ] Parse de 24 bpp RGB/BGR little-endian.
-- [ ] Parse de 16 bpp RGB565.
-- [ ] Formato desconhecido retorna erro com bpp/offsets.
-- [ ] Conversão de canal 8→5 e 8→6 com arredondamento.
-- [ ] Escrita de linha respeita `line_length` e padding.
-- [ ] `xres/yres` inválidos são rejeitados antes do mmap.
-- [ ] `line_length < xres * bpp/8` é rejeitado.
-- [ ] `yres_virtual` insuficiente é rejeitado.
-- [ ] Buffer completo tem exatamente `line_length * yres` bytes.
-- [ ] `ypan` só é usado com `ypanstep > 0`, memória suficiente e alinhamento.
-- [ ] Sem `ypan`, o frame é escrito por inteiro.
+- [x] `fb_var_screeninfo` = 160 bytes; `fb_fix_screeninfo` = 80 bytes.
+- [x] Parse de 32 bpp RGBX/BGRX/XRGB/XBGR.
+- [x] Parse de 24 bpp RGB/BGR little-endian.
+- [x] Parse de 16 bpp RGB565.
+- [x] Formato desconhecido retorna erro com bpp/offsets.
+- [x] Conversão de canal 8→5 e 8→6 com arredondamento.
+- [x] Escrita de linha respeita `line_length` e padding.
+- [x] `xres/yres` inválidos são rejeitados antes do mmap.
+- [x] `line_length < xres * bpp/8` é rejeitado.
+- [x] `yres_virtual` insuficiente é rejeitado.
+- [x] Buffer completo tem exatamente `line_length * yres` bytes.
+- [x] `ypan` só é usado com `ypanstep > 0`, memória suficiente e alinhamento.
+- [x] Sem `ypan`, o frame é escrito por inteiro.
 
 ### 5.2 Alpha, escala e geometria
 
-- [ ] Blend com alpha 0, opaco e parcial usando RGBA pré-multiplicado.
-- [ ] Escala 1:1 não reamostra.
-- [ ] Escala fracionária usa bilinear.
-- [ ] Geometria em 1920 × 1080 → escala 1,0 e offsets (0,0).
-- [ ] Geometria em 2560 × 1440 → escala 1,333… centralizada.
-- [ ] Geometria em 1366 × 768 e 1024 × 768 → canvas cabe e centraliza.
-- [ ] Canvas não fica vazio nem transborda.
-- [ ] Fundo cobre toda a tela.
-- [ ] Card e fita respeitam as coordenadas de `docs/03`.
+- [x] Blend com alpha 0, opaco e parcial usando RGBA pré-multiplicado.
+- [x] Escala 1:1 não reamostra.
+- [x] Escala fracionária usa bilinear.
+- [x] Geometria em 1920 × 1080 → escala 1,0 e canvas centrado em (288, 162).
+- [x] Geometria em 2560 × 1440 → escala 1,333… centralizada.
+- [x] Geometria em 1366 × 768 e 1024 × 768 → canvas cabe e centraliza.
+- [x] Canvas não fica vazio nem transborda.
+- [x] Fundo cobre toda a tela.
+- [x] Card e fita respeitam as coordenadas de `docs/03`.
 
 ### 5.3 Texto
 
-- [ ] Cobertura de glifos para todos os caracteres do catálogo.
-- [ ] Medição antes de alinhar à direita/centro.
-- [ ] Cache de glifos evita rasterização repetida.
-- [ ] Nenhum texto essencial quebra ou sai do card.
-- [ ] Strings longas pt/en são medidas e truncadas apenas onde permitido.
-- [ ] Display com 16 caracteres cabe em 672 px a 64 px.
-- [ ] Fonte ausente/inválida falha com mensagem clara (teste de build).
+- [x] Cobertura de glifos para todos os caracteres do catálogo.
+- [x] Medição antes de alinhar à direita/centro.
+- [x] Cache de glifos evita rasterização repetida.
+- [x] Nenhum texto essencial quebra ou sai do card.
+- [x] Strings longas pt/en são medidas e truncadas apenas onde permitido.
+- [x] Display com 16 caracteres cabe em 672 px a 64 px.
+- [x] Fonte ausente/inválida falha com mensagem clara (teste de build).
 
 ### 5.4 Cores e tema
 
-- [ ] Tokens truecolor, 256, 16 e mono resolvem para valores válidos.
-- [ ] `NO_COLOR` força mono.
-- [ ] `--color never` força mono.
-- [ ] `--color auto` escolhe truecolor em 32 bpp e 256 em 16 bpp.
+- [x] Tokens truecolor, 256, 16 e mono resolvem para valores válidos.
+- [x] `NO_COLOR` força mono.
+- [x] `--color never` força mono.
+- [x] `--color auto` escolhe truecolor em 32 bpp e 256 em 16 bpp.
 - [ ] Contraste mínimo verificado nos tokens principais.
-- [ ] Estado de tecla pressionada tem relevo/borda além de cor.
-- [ ] Seleção de histórico tem barra além de fundo.
+- [x] Estado de tecla pressionada tem relevo/borda além de cor.
+- [x] Seleção de histórico tem barra além de fundo.
 
 ## 6. Capturas douradas (PNG)
 
@@ -210,7 +211,9 @@ Tabela mínima:
 15. Textos longos pt-BR.
 16. Textos longos en.
 
-Cada captura: 1344 × 756, RGBA8, sem metadados variáveis.
+Cada captura: 1344 × 756, RGBA8, sem metadados variáveis. As 16 capturas
+foram geradas e são comparadas por bytes RGBA em `tests/golden.rs`.
+Atualização: `UPDATE_SNAPSHOTS=1 cargo test --test golden`.
 
 ### 6.2 Comparação
 
@@ -233,13 +236,15 @@ Cada captura: 1344 × 756, RGBA8, sem metadados variáveis.
 
 ## 7. Integração e PTY
 
-- [ ] Guarda de raw mode restaura termios em `Drop` (teste com PTY).
-- [ ] `ensure_tty` rejeita stdin não-TTY com código 3.
-- [ ] `SIGTERM`/`SIGHUP` marcam flag e o loop sai restaurando.
-- [ ] Panic hook restaura antes de imprimir.
-- [ ] `Ctrl+C` em raw mode vira `Quit`, não sinal.
-- [ ] Mudança de idioma/som não corrompe o estado do cálculo.
-- [ ] Sem fb: mensagem de permissão e de VT são distintas.
+- [x] Guarda de raw mode restaura termios em `Drop` (teste com PTY/`script`).
+- [x] `ensure_tty` rejeita stdin não-TTY com código 3.
+- [x] `SIGTERM` marca a flag em teste de processo; `SIGHUP` usa o mesmo
+  handler. Saída do loop com restauração visual só é observável em VT.
+- [x] Panic hook chama a restauração antes de imprimir (código); validação
+  visual pendente em VT.
+- [x] `Ctrl+C` em raw mode vira `Quit`, não sinal.
+- [x] Mudança de idioma/som não corrompe o estado do cálculo.
+- [x] Sem fb: mensagem de permissão e de VT são distintas (testes de unidade).
 
 ## 8. Falhas e códigos de saída
 
@@ -308,9 +313,11 @@ cargo test -- --nocapture
 ## 11. Cobertura e meta
 
 - Meta: **≥ 150 casos de teste** no total (tabelas contam casos).
-- Fase 1: **112 casos** (106 unitários + 5 de processo/CLI + 1 do xtask).
+- Fase 1: 112 casos; Fase 2: 163; Fase 3: **182 testes ativos** (170
+  unitários, 8 de processo/CLI, 1 golden, 1 PTY, 1 sinais, 1 xtask), mais 2
+  auxiliares `#[ignore]` executados pelos testes de PTY/sinais.
 - Domínio puro deve ter a maior densidade; renderização cobre formatos e
-  estados.
+  estados; 16 capturas douradas cobrem os estados visuais.
 - Nenhuma linha de `unsafe` sem teste de ABI/limites correspondente.
 - Cobertura de linha é indicativa; o critério é comportamental.
 
@@ -334,8 +341,9 @@ cargo test -- --nocapture
 | Manifesto/xtask | **concluído** (1) |
 | Testes de framebuffer, layout, texto e blend | **concluído** na Fase 2 |
 | Captura determinística headless | **concluído** na Fase 2 |
-| Capturas douradas de estados | pendente (Fase 3) |
-| Integração/PTY | pendente (Fase 3) |
+| Capturas douradas de estados | **concluído** na Fase 3 (16 PNGs) |
+| Integração/PTY e sinais | **concluído** no headless na Fase 3 |
+| Fluxo completo de cálculo | **concluído** na Fase 3 (headless/App) |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
 
 Portões executados em 2026-10-25:
@@ -345,8 +353,8 @@ Portões executados em 2026-10-25:
 | `cargo fmt --all -- --check` | verde |
 | `cargo clippy --workspace --all-targets -- -D warnings` | verde |
 | `cargo clippy --workspace --all-targets --no-default-features -- -D warnings` | verde |
-| `cargo test --workspace` | 112 verdes |
-| `cargo test --workspace --no-default-features` | 112 verdes |
+| `cargo test --workspace` | 182 ativos verdes (Fase 3) |
+| `cargo test --workspace --no-default-features` | 182 ativos verdes (Fase 3) |
 | `cargo xtask assets --check` | verde |
 | `cargo build --release` | verde |
 | `cargo build --release --no-default-features` | verde |

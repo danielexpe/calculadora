@@ -7,34 +7,40 @@ framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
 servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e
 suporte a português e inglês.
 
-**Versão inicial 0.1.0 — Fases 1 e 2 concluídas em 2026-10-25.** O domínio, a
-CLI, o fbdev, o texto, o tema, o app estático e a captura PNG já funcionam e
-estão testados. **Esta versão ainda não calcula na tela:** as teclas de cálculo
-são mapeadas e o domínio tem testes, mas o fluxo input → visor → histórico
-entra na Fase 3. A execução em VT real também ainda não foi validada neste
-ambiente (falta permissão no `/dev/fb0` e um VT livre). Consulte
-`docs/06-roadmap.md`.
+**Versão inicial 0.1.0 — Fases 1 a 3 concluídas em 2026-10-25 no caminho
+testável sem hardware.** O fluxo completo já funciona: digitação, quatro
+operações, porcentagem, sinal, AC/DEL, erros, fita de histórico com rolagem e
+recall, `F2`, `M`, flash de tecla e debounce de confirmação. A captura PNG e as
+16 capturas douradas estão implementadas. **A execução em VT real continua sem
+validação neste ambiente** (falta permissão no `/dev/fb0` e um VT livre), e o
+áudio/fade de histórico ficam para a Fase 4. Consulte `docs/06-roadmap.md`.
 
 ## O que funciona agora
 
+- Cálculo completo pelo teclado: `+`, `−`, `×`, `÷`, `±`, `%`, `AC`, `DEL`.
+- Visor com expressão, resultado, erro e modo resultado; aritmética decimal
+  exata e avaliação sequencial.
+- Fita com até 50 entradas, 10 visíveis, rolagem orientada pela seleção e recall
+  do resultado com `Enter`/`=`.
+- `F2` alterna pt-BR/en (inclusive histórico e separadores); `M` alterna o
+  estado do som; `Q`/`Esc`/`Ctrl+C` saem restaurando o console.
+- Flash de tecla de 90 ms (60 ms com `--no-animations`), debounce de 120 ms em
+  `=`/`Enter` e marcador de som por forma (preenchido/vazado/traço).
+- Paletas truecolor, 256, 16 e monocromática.
 - Captura PNG determinística de 1344 × 756, sem abrir framebuffer, TTY ou áudio.
-- Renderização da tela inicial no framebuffer: fundo, fita de histórico vazia,
-  visor `0`, keypad completo e rodapé.
-- Paletas truecolor, 256, 16 e monocromática; pt-BR e en.
-- `F2` alterna o idioma, `M` alterna o estado do som e `Q`/`Esc`/`Ctrl+C` saem
-  restaurando o console.
+- 16 capturas douradas em `tests/snapshots/` cobrindo inicial pt/en, pendência,
+  resultado, porcentagem, erro, histórico, seleção, flash, paletas, som e
+  textos longos.
 - fbdev com validação de ABI e formatos 32, 24 e 16 bpp (a validação em
   hardware dos modos 24/16 ainda está pendente).
-- Domínio decimal, percentual, arredondamento, histórico e regras de entrada
-  cobertos por testes automatizados.
 
 ## O que ainda não funciona
 
-- Digitar, calcular, navegar no histórico e recuperar resultados na tela
-  (Fase 3). Nesta versão, apenas `F2`, `M` e a saída alteram a interface.
-- Animações, áudio e ajustes finais de acessibilidade (Fase 4).
-- Validação em VT real e nos modos 24/16 bpp (Fase 5; bloqueada por permissão
-  e hardware).
+- Áudio real (clique/erro) e fade de nova entrada da fita (Fase 4). O status de
+  som já é exibido, mas o backend ALSA ainda não foi ligado.
+- Validação em VT real, restauração observada no console e modos 24/16 bpp
+  (Fase 5; bloqueada por permissão e hardware).
+- Troca de VT durante a execução pode deixar resíduos; saia do app antes.
 
 ## Visão do produto
 
@@ -142,8 +148,18 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
-Estado esperado desta versão: **163 testes verdes** (154 unitários, 8 de
-processo e 1 do xtask), clippy sem avisos e manifesto de assets atualizado.
+Estado esperado desta versão: **182 testes ativos verdes** — 170 unitários,
+8 de processo/CLI, 1 de capturas douradas, 1 de PTY, 1 de sinais e 1 do xtask —
+além de 2 testes auxiliares `#[ignore]` usados pelos testes de PTY e sinais.
+O clippy deve ficar sem avisos e o manifesto de assets atualizado.
+
+Para validar apenas as capturas douradas (16 estados):
+
+```bash
+cargo test --test golden
+# regenerar após revisar a mudança visual:
+UPDATE_SNAPSHOTS=1 cargo test --test golden
+```
 
 ### 4. Execução em VT local (framebuffer real)
 
@@ -172,10 +188,16 @@ O que observar nesta versão:
 
 - A tela inicial deve aparecer centralizada, com a fita vazia, o visor `0` e o
   keypad.
-- `F2` deve trocar `PT`/`EN` e o separador da tecla decimal.
-- `M` deve alternar `Som: ligado`/`Som: desligado`.
+- Digite `200 + 10 % =` e confirme `220` no visor e uma entrada na fita.
+- Faça `0,1 + 0,2 =` e confirme `0,3`.
+- Faça `1 ÷ 0 =` e confirme `Erro`/`Divisão por zero`; digite `7` para
+  recuperar.
+- A fita registra as operações; `↑`/`↓` navegam e `Enter` recupera o resultado
+  sem criar nova entrada.
+- `F2` deve trocar `PT`/`EN`, o rodapé, o histórico e o separador decimal.
+- `M` deve alternar `Som: ligado`/`Som: desligado` (o áudio real chega na
+  Fase 4).
 - `Q`, `Esc` ou `Ctrl+C` devem sair e devolver o console em modo texto.
-- Teclas de dígitos e operadores ainda não alteram o visor nesta fase.
 
 Para testar a restauração por sinal, abra outro VT, descubra o PID e envie
 `SIGTERM`:
@@ -196,7 +218,9 @@ em execução; se isso acontecer, saia e reinicie.
 - [ ] `--lang en`, `--color never` e `--no-audio` alteram a captura.
 - [ ] A captura funciona com `--fb-device` inexistente.
 - [ ] Os portões automatizados passam com e sem features.
-- [ ] No VT, a tela aparece, `F2`/`M` funcionam e `Q` restaura o console.
+- [ ] No VT, a tela aparece e o fluxo `200 + 10 % =` mostra `220`.
+- [ ] No VT, `↑`/`↓`/`Enter` navegam e recuperam o histórico.
+- [ ] No VT, `F2`/`M` funcionam e `Q` restaura o console.
 - [ ] Sem permissão no fb, a mensagem orienta o grupo `video` (código 3).
 
 ## Uso
@@ -225,12 +249,12 @@ interativo nem áudio.
 | Tecla | Ação | Estado |
 | --- | --- | --- |
 | `F2` | alterna pt-BR / en | funciona |
-| `M` | liga/desliga o estado do som | funciona |
+| `M` | liga/desliga o estado do som | funciona (áudio na Fase 4) |
 | `Q`, `Esc`, `Ctrl+C` | sai e restaura o console | funciona |
-| `0`–`9`, `,`/`.`, `+` `-` `*` `/` | dígitos, separador e operações | mapeadas; visor só na Fase 3 |
-| `Enter` ou `=` | calcula ou recupera histórico | mapeada; visor só na Fase 3 |
-| `Backspace`, `Delete`/`C`, `S`, `%` | apagar, limpar, sinal e porcentagem | mapeadas; visor só na Fase 3 |
-| `↑` / `↓` | navega na fita de histórico | mapeadas; seleção só na Fase 3 |
+| `0`–`9`, `,`/`.`, `+` `-` `*` `/` | dígitos, separador e operações | funciona |
+| `Enter` ou `=` | calcula; com seleção, recupera o resultado | funciona |
+| `Backspace`, `Delete`/`C`, `S`, `%` | apagar, limpar, sinal e porcentagem | funciona |
+| `↑` / `↓` | navega na fita de histórico | funciona |
 
 ## Códigos de saída
 

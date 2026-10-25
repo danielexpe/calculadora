@@ -143,6 +143,10 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | `--capture-frame` release | verde | PNG 1344 × 756; ~40 ms; hash estável |
 | 2026-10-25 | Build release com/sem features | verde | binário 3,4 MB |
 | 2026-10-25 | Abertura `/dev/fb0` sem permissão | verde (erro esperado) | código 3; instrução do grupo `video` |
+| 2026-10-25 | Fase 3: fluxo App, flash, debounce, histórico e 16 capturas | verde | 182 testes ativos; 2 auxiliares `#[ignore]` |
+| 2026-10-25 | Capturas douradas RGBA (16 estados) | verde | `cargo test --test golden` |
+| 2026-10-25 | Raw mode restaurado em PTY | verde | `tests/pty_guard.rs` via `script` |
+| 2026-10-25 | `SIGTERM` marca flag de saída | verde | `tests/signals.rs` em processo filho |
 | — | Execução em `/dev/fb0` em VT | **PENDENTE** | P-01/P-02: grupo `video` e VT livre |
 | — | 24 bpp / 16 bpp | **PENDENTE** | hardware/VM não confirmados |
 | — | Áudio real | **PENDENTE** | Fase 4 |
@@ -175,6 +179,25 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   pré-multiplicado, cobertura de glifos, determinismo e PNG válido.
 - Execução sem permissão no fb retorna código 3 com instrução acionável.
 - **Não validado em VT real**; P-01/P-02 continuam abertos.
+
+## 3.2 Evidência da Fase 3 (headless)
+
+- `App` em `src/app.rs` roteia globais, cálculo, histórico, flash e debounce;
+  `app.rs` contém testes de fluxo, seleção/recall, debounce, flash e erro.
+- 16 capturas douradas em `tests/snapshots/` (1344 × 756, PNG RGBA8),
+  comparadas byte a byte por RGBA em `tests/golden.rs`. Regeração:
+  `UPDATE_SNAPSHOTS=1 cargo test --test golden`.
+- Captura CLI inicial: hash
+  `49f71919...32c0cb6` (mudou em relação à Fase 2 por causa do marcador de som).
+- Release: captura em ~40 ms; suíte dourada completa em ~0,25 s para 16 quadros
+  (inclui renderização, PNG e comparação), indicativo de ~16 ms/quadro.
+- PTY: `RawModeGuard` altera `-icanon`/`-echo` e restaura o `termios` em
+  `Drop`, verificado com `stty` dentro de um PTY criado por `script`.
+- `SIGTERM` seta a flag atômica em processo filho; `Ctrl+C` é mapeado para
+  `Quit` e não depende de sinal.
+- **Pendente:** fluxo e restauração visual em VT real (P-01/P-02), `SIGHUP`
+  observado no console, panic induzido em VT, latência de tecla e áudio.
+- Nenhum framebuffer/tty foi aberto pelos testes headless.
 
 ## 4. Bloqueios ativos
 
@@ -265,6 +288,8 @@ Seguir `docs/05-test-plan.md`, seção 9. Registrar cada item como
 | Assets | < 4 MB | 1.387.923 B (1,39 MB) | 2026-10-25 |
 | Latência de tecla | < 50 ms | — | — |
 | Captura | < 1 s | ~40 ms (release, headless) | 2026-10-25 |
+| Suíte dourada (16 quadros) | — | ~0,25 s em release | 2026-10-25 |
+| Latência de tecla | < 50 ms | — (requer VT) | — |
 
 Preencher apenas com medições reais em release.
 
@@ -277,3 +302,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Fase 1: domínio, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados |
 | 2026-10-25 | Commit inicial `ed07e19` com especificação e Fase 1 |
 | 2026-10-25 | Fase 2: fbdev/ABI/formatos, console e sinais, tema, cena/texto, captura PNG, app estático; 163 testes no total |
+| 2026-10-25 | Fase 3: fluxo Input→App→cena, histórico com rolagem/recall, flash/debounce, marcador de som, 16 capturas douradas, PTY e teste de sinal; 182 testes ativos + 2 auxiliares |

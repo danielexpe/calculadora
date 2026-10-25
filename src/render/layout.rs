@@ -39,6 +39,12 @@ pub const KEYPAD_Y: f32 = 296.0;
 pub const FOOTER_X: f32 = 536.0;
 pub const FOOTER_Y: f32 = 656.0;
 pub const FOOTER_H: f32 = 20.0;
+pub const LANGUAGE_CHIP_X: f32 = 1044.0;
+pub const SOUND_MARKER_X: f32 = 1076.0;
+pub const SOUND_MARKER_Y: f32 = 662.0;
+pub const SOUND_MARKER_SIZE: f32 = 8.0;
+pub const SOUND_TEXT_X: f32 = 1092.0;
+pub const SOUND_TEXT_W: f32 = 148.0;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum KeyId {
