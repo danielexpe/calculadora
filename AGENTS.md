@@ -31,8 +31,8 @@
 | Fase 4 — Acabamento | **concluída** (2026-10-25); detalhes de áudio/latência/24-16 pendentes |
 | Fase 5 — Release | pendente |
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
-| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65` |
-| Commits/releases | 4 commits locais (`ed07e19`, `7923129`, `f691b0c`, `ab0dd65`); nenhum push/release |
+| Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65`, `ac97f03` |
+| Commits/releases | 6 commits locais (4 de feature + 2 de registro); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -207,9 +207,9 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `f691b0c` |
 | 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | `f691b0c` |
 | 2026-10-25 | Fase 3: `App` (input→cálculo→cena, histórico/recall, flash, debounce), marcador de som, rolagem da fita, 16 capturas douradas, testes PTY/sinais e README atualizado; 182 testes ativos + 2 auxiliares | `src/app.rs`, `src/input.rs`, `src/capture.rs`, `src/render/scene.rs`, `src/render/layout.rs`, `tests/golden.rs`, `tests/pty_guard.rs`, `tests/signals.rs`, `tests/snapshots/**`, `README.md`, `docs/**`, `AGENTS.md` | `ab0dd65` |
-| 2026-10-25 | Fase 4: áudio sintetizado + ALSA dinâmico (feature audio), fade de 120 ms, contraste/paletas corrigidos, compositor com fundo em cache, 16 douradas regeneradas e README/docs atualizados; 194 testes ativos + 2 auxiliares | `src/audio.rs`, `src/platform/audio.rs`, `src/app.rs`, `src/theme.rs`, `src/render/fb.rs`, `src/render/scene.rs`, `tests/cli_process.rs`, `tests/snapshots/**`, `Cargo.toml`, `README.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
-| 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | pendente (sem commit) |
-| 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Fase 4: áudio sintetizado + ALSA dinâmico (feature audio), fade de 120 ms, contraste/paletas corrigidos, compositor com fundo em cache, 16 douradas regeneradas e README/docs atualizados; 194 testes ativos + 2 auxiliares | `src/audio.rs`, `src/platform/audio.rs`, `src/app.rs`, `src/theme.rs`, `src/render/fb.rs`, `src/render/scene.rs`, `tests/cli_process.rs`, `tests/snapshots/**`, `Cargo.toml`, `README.md`, `docs/**`, `AGENTS.md` | `ac97f03` |
+| 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | `ac97f03` |
+| 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | `ac97f03` |
 
 ## 11. Fases
 
