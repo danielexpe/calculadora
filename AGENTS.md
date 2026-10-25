@@ -32,7 +32,7 @@
 | Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.0 |
 | Versão | **1.0.0** |
 | Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
-| SHA-256 do pacote | `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84` |
+| SHA-256 do pacote | `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc` |
 | Validação em hardware | **teste manual completo OK** (2026-10-25); 24/16 e sinais/pânico pendentes |
 | Repositório git | `main` local; remoto público `origin` (GitHub) |
 | Repositório remoto | https://github.com/danielexpe/calculadora |
@@ -222,6 +222,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Repositório público criado, `main` enviado e teste final registrado | `.git/config`, `AGENTS.md`, `docs/**` | `76fd036` |
 | 2026-10-25 | Tag `v1.0.0` e GitHub release público com `tar.gz` + `.sha256`; assets verificados por download | `README.md`, `AGENTS.md`, `docs/**` | `ea20484` |
 | 2026-10-25 | Housekeeping: Fase 6/backlog removidos (D-020), status final e pendências opcionais | `AGENTS.md`, `docs/01-calculadora.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` | `6cdc306` |
+| 2026-10-25 | README reescrito para usuários e desenvolvedores; pacote regenerado (hash `62829f59…`) e release a atualizar | `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | pendente (sem commit) |
 
 ## 11. Fases
 

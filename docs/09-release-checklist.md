@@ -10,7 +10,7 @@ Repositório público: https://github.com/danielexpe/calculadora
 Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
 
 Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
-Hash SHA-256: `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
+Hash SHA-256: `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`
 
 ## Funcional
 

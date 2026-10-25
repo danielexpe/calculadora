@@ -2,89 +2,59 @@
 
 > Cálculo essencial, com elegância.
 
-Repositório: https://github.com/danielexpe/calculadora
-
-Release: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
-
 Calculadora decimal para **console Linux local**, renderizada diretamente no
-framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
-servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e
-suporte a português e inglês.
+framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede em runtime e sem servidor
+gráfico. Interface escura, tipografia cuidada, fita de histórico e suporte a
+português e inglês.
 
-**Versão 1.0.0 — Fases 1 a 5 concluídas em 2026-10-25.** O fluxo
-completo funciona: digitação, quatro operações, porcentagem, sinal, AC/DEL,
-erros, fita com rolagem/recall, `F2`, `M`, flash, debounce, fade da fita, áudio
-sintetizado com fallback silencioso, paletas e captura PNG com 16 douradas.
-**O teste manual completo em VT foi reportado OK em 2026-10-25** (fluxo,
-áudio, histórico, fade, paletas e saída). Ainda faltam 24/16 bpp, MSRV 1.88 e
-os detalhes de `SIGHUP`/pânico e medições de CPU/latência. Consulte
-`docs/06-roadmap.md`.
+- Repositório: https://github.com/danielexpe/calculadora
+- Release 1.0.0: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+- Licença do código: MIT
 
-## O que funciona agora
+## Sumário
 
-- Cálculo completo pelo teclado: `+`, `−`, `×`, `÷`, `±`, `%`, `AC`, `DEL`.
-- Visor com expressão, resultado, erro e modo resultado; aritmética decimal
-  exata e avaliação sequencial.
-- Fita com até 50 entradas, 10 visíveis, rolagem orientada pela seleção e recall
-  do resultado com `Enter`/`=`.
-- `F2` alterna pt-BR/en (inclusive histórico e separadores); `M` alterna mudo;
-  `Q`/`Esc`/`Ctrl+C` saem restaurando o console.
-- Flash de tecla de 90 ms (60 ms com `--no-animations`), debounce de 120 ms em
-  `=`/`Enter`, fade de 120 ms na nova entrada da fita e marcador de som por
-  forma (preenchido/vazado/traço).
-- Áudio opcional: clique curto para entrada aceita e tom grave para erro, via
-  ALSA dinâmico; sem ALSA/dispositivo o app mostra `Som: indisponível` e segue
-  em silêncio. `--no-audio` inicia mudo.
-- Paletas truecolor, 256, 16 e monocromática, com contraste testado
-  (primário ≥ 7:1, secundário/muted ≥ 4,5:1, acento ≥ 10:1).
-- Captura PNG determinística de 1344 × 756, sem abrir framebuffer, TTY ou áudio.
-- 16 capturas douradas em `tests/snapshots/` cobrindo inicial pt/en, pendência,
-  resultado, porcentagem, erro, histórico, seleção, flash, paletas, som e
-  textos longos.
-- fbdev com validação de ABI e formatos 32, 24 e 16 bpp (a validação em
-  hardware dos modos 24/16 ainda está pendente).
+- [Para quem só quer usar](#para-quem-só-quer-usar)
+  - [Requisitos do sistema](#requisitos-do-sistema)
+  - [Baixar e instalar](#baixar-e-instalar)
+  - [Liberar acesso ao framebuffer](#liberar-acesso-ao-framebuffer)
+  - [Executar no console](#executar-no-console)
+  - [Usar a calculadora](#usar-a-calculadora)
+  - [Áudio](#áudio)
+  - [Atualizar e desinstalar](#atualizar-e-desinstalar)
+  - [Solução de problemas](#solução-de-problemas)
+- [Para desenvolvedores](#para-desenvolvedores)
+  - [Dependências de compilação](#dependências-de-compilação)
+  - [Compilar e executar](#compilar-e-executar)
+  - [Testes e portões](#testes-e-portões)
+  - [Captura PNG e QA sem hardware](#captura-png-e-qa-sem-hardware)
+  - [Estrutura do projeto](#estrutura-do-projeto)
+  - [Empacotamento](#empacotamento)
+  - [Contribuição](#contribuição)
+- [Estado, limitações e licenças](#estado-limitações-e-licenças)
 
-## O que ainda não funciona
+---
 
-- Modos 24/16 bpp e resoluções alternativas (sem hardware/VM).
-- Detalhes de restauração em `SIGHUP`/pânico e medições formais de CPU/latência.
-- MSRV 1.88 (o release foi gerado com Rust 1.99.1).
-- Troca de VT durante a execução pode deixar resíduos; saia do app antes.
+## Para quem só quer usar
 
-## Visão do produto
+O pacote oficial é um binário Linux x86_64 autossuficiente. **Não é necessário
+instalar Rust, compilador, fontes ou arquivos de arte.** As fontes e o layout
+estão embutidos no executável.
 
-- Quatro operações básicas, sinal, porcentagem contextual e apagar dígito.
-- Aritmética decimal exata (`rust_decimal`), não ponto flutuante binário.
-- Visor com até 12 dígitos significativos, separador de milhar e notação
-  científica para valores extremos.
-- Fita de histórico da sessão, navegável por teclado.
-- Interface em pt-BR e en, alternável com `F2`.
-- Clique de tecla opcional sintetizado em runtime; sem arquivos de áudio.
-- Acesso por teclado; mouse fora do escopo da v1.
+### Requisitos do sistema
 
-## Pacote distribuído
+| Item | Necessário |
+| --- | --- |
+| Sistema | Linux x86_64 |
+| Console | VT local com fbdev e `/dev/fb0` |
+| Permissão | usuário no grupo `video` (ou ACL equivalente no device) |
+| Bibliotecas runtime | `libc.so.6`, `libm.so.6` e `libgcc_s.so.1` (glibc, não musl) |
+| Áudio | opcional; ALSA/PipeWire com `libasound.so.2` |
+| Rede | não é usada pelo aplicativo em runtime |
 
-O pacote `calculadora-1.0.0-linux-x86_64.tar.gz` contém o binário, README,
-licenças, notices, notas de release e textos OFL. Ele não depende da pasta
-`assets/`:
-
-```bash
-tar -xzf calculadora-1.0.0-linux-x86_64.tar.gz
-cd calculadora-1.0.0-linux-x86_64
-./calculadora --version
-./calculadora              # execute em um VT local
-```
-
-O checksum acompanha o pacote em `calculadora-1.0.0-linux-x86_64.tar.gz.sha256`.
-
-## Requisitos
-
-- Linux x86_64 local, com VT ativo para usar o framebuffer (não serve sessão
-  X11/Wayland/SSH).
-- `/dev/fb0` disponível. Alvo oficial: `amdgpudrmfb`, 1920 × 1080, 32 bpp.
-- Usuário no grupo `video` (a permissão típica é `root:video 660`).
-- Rust stable, edição 2021, MSRV sugerida 1.88+ (ambiente atual: 1.99.1).
-- Fontes Inter e JetBrains Mono embutidas no binário (OFL 1.1).
+O alvo validado é `amdgpudrmfb`, 1920 × 1080, 32 bpp. O app escala o canvas para
+outras resoluções e aceita framebuffers de 32, 24 e 16 bpp, mas a validação em
+hardware foi feita apenas no alvo acima. **Não funciona** a partir de um
+terminal dentro de X11/Wayland, SSH ou tmux; é necessário um VT de console.
 
 Diagnóstico rápido:
 
@@ -93,86 +63,320 @@ ls -l /dev/fb0
 cat /sys/class/graphics/fb0/name
 cat /sys/class/graphics/fb0/virtual_size
 cat /sys/class/graphics/fb0/bits_per_pixel
-id -nG            # deve conter video
+id -nG
 ```
 
-Se `video` não aparecer, adicione o usuário e **faça novo login**:
+Se `/dev/fb0` não existir, o sistema não expõe framebuffer fbdev e o app não
+pode ser usado nele. Se existir mas não for gravável, veja a seção de
+permissões.
+
+### Baixar e instalar
+
+Baixe o pacote e o checksum da release `v1.0.0`:
 
 ```bash
-sudo usermod -aG video "$USER"
-newgrp video      # alternativa imediata para a sessão atual
-id -nG            # confirme que 'video' aparece
+mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+cd /tmp
+
+curl -fLO \
+  https://github.com/danielexpe/calculadora/releases/download/v1.0.0/calculadora-1.0.0-linux-x86_64.tar.gz
+curl -fLO \
+  https://github.com/danielexpe/calculadora/releases/download/v1.0.0/calculadora-1.0.0-linux-x86_64.tar.gz.sha256
+
+sha256sum -c calculadora-1.0.0-linux-x86_64.tar.gz.sha256
 ```
 
-## Como testar esta versão
-
-### 1. Compilar
+O checksum detecta download corrompido; ele não substitui uma assinatura
+criptográfica. Depois extraia e instale:
 
 ```bash
-cargo build --release
-./target/release/calculadora --version
+tar -xzf calculadora-1.0.0-linux-x86_64.tar.gz -C "$HOME/.local/opt"
+
+ln -sfn \
+  "$HOME/.local/opt/calculadora-1.0.0-linux-x86_64/calculadora" \
+  "$HOME/.local/bin/calculadora"
+
+"$HOME/.local/bin/calculadora" --version
 ```
 
 Saída esperada: `calculadora 1.0.0`.
 
-O binário é autossuficiente: as fontes estão embutidas e nada é lido do disco
-em runtime. Para confirmar, copie-o para outro diretório e gere uma captura:
+Se `$HOME/.local/bin` não estiver no `PATH`, use o caminho completo
+`"$HOME/.local/bin/calculadora"` ou adicione a pasta ao `PATH` no seu shell.
+
+O pacote contém:
+
+- `calculadora` — executável;
+- `README.md`, `RELEASE_NOTES.md`;
+- `LICENSE`, `LICENSE-ART`;
+- `THIRD_PARTY_NOTICES.md`;
+- `licenses/OFL-Inter.txt`, `licenses/OFL-JetBrainsMono.txt`.
+
+O diretório `assets/` do código-fonte **não** é necessário para executar.
+
+### Liberar acesso ao framebuffer
+
+A permissão típica é `root:video` com modo `660`. Adicione seu usuário ao grupo
+`video`:
 
 ```bash
-cp target/release/calculadora /tmp/
-cd /tmp
-./calculadora --capture-frame /tmp/calculadora-embedded.png
-cd - >/dev/null
+sudo usermod -aG video "$USER"
 ```
 
-### 1.1 Atalho automatizado
-
-O script `user_run_now.sh` compila a release com áudio, valida `/dev/fb0`,
-grupos, ALSA e uma captura de sanidade, e só então inicia o app. Fora de um VT
-local ele explica o que fazer e sai com código `3`; use `--check` para validar
-sem abrir o framebuffer.
+O grupo só passa a valer em uma nova sessão. Saia e entre novamente, reinicie,
+ou faça login em um VT novo. Para conferir:
 
 ```bash
-./user_run_now.sh --check
-./user_run_now.sh              # execute dentro do VT local
-./user_run_now.sh --color 16   # flags são repassadas ao app
+id -nG          # deve listar video
+test -w /dev/fb0 && echo "fb gravável"
 ```
 
-### 2. Teste headless (recomendado, não abre framebuffer)
+Em alguns sistemas o device usa ACL; nesse caso a escrita pode funcionar mesmo
+sem o grupo. Não é necessário executar a calculadora com `sudo`.
 
-Gere a tela inicial em dois estados:
+### Executar no console
+
+1. Salve o caminho do binário: `$HOME/.local/bin/calculadora`.
+2. Troque para um VT livre com `Ctrl+Alt+F3` (ou F4, F5…).
+3. Faça login com o mesmo usuário.
+4. Execute:
 
 ```bash
-tmp=$(mktemp -d)
-./target/release/calculadora --capture-frame "$tmp/pt.png"
-./target/release/calculadora --lang en --color never \
-  --capture-frame "$tmp/en-mono.png"
-file "$tmp/pt.png" "$tmp/en-mono.png"
+"$HOME/.local/bin/calculadora"
 ```
 
-Saída esperada: ambos com `PNG image data, 1344 x 756, 8-bit/color RGBA`.
-Abra os arquivos em qualquer visualizador de imagens.
-
-Verifique o determinismo:
+Também é possível trocar de VT a partir da sessão gráfica:
 
 ```bash
-./target/release/calculadora --capture-frame "$tmp/pt-2.png"
-cmp "$tmp/pt.png" "$tmp/pt-2.png" && echo "captura determinística"
-sha256sum "$tmp/pt.png" "$tmp/pt-2.png"
+sudo chvt 3
 ```
 
-Os hashes devem ser iguais na mesma toolchain. Para provar que a captura não
-toca no framebuffer, aponte `--fb-device` para um caminho inexistente:
+Para voltar à sessão gráfica, use `Ctrl+Alt+F2` ou o VT correspondente.
+
+Ao iniciar, o app entra em modo gráfico do console, esconde o cursor, desenha a
+interface e restaura o console quando você sai com `Q`, `Esc`, `Ctrl+C` ou
+`SIGTERM`. Evite trocar de VT enquanto o app estiver aberto; se isso acontecer,
+volte ao VT e saia normalmente.
+
+### Usar a calculadora
+
+A interface tem duas áreas: a fita de histórico à esquerda e o card de cálculo
+à direita. Tudo é operado pelo teclado; não há mouse.
+
+#### Teclas
+
+| Tecla | Ação |
+| --- | --- |
+| `0`–`9` (fileira superior e numpad) | digita dígito |
+| `,` ou `.` | separador decimal |
+| `+` `-` `*` `/` | soma, subtração, multiplicação e divisão |
+| `Enter` ou `=` | calcula; com histórico selecionado, recupera o resultado |
+| `Backspace` | apaga o último dígito |
+| `Delete` ou `C` | limpa tudo (`AC`) |
+| `S` | troca o sinal (`±`) |
+| `%` | porcentagem contextual |
+| `↑` / `↓` | navega na fita de histórico |
+| `F2` | alterna português (BR) / inglês |
+| `M` | liga/desliga o som |
+| `Q`, `Esc`, `Ctrl+C` | sai e restaura o console |
+
+**Numpad:** ative `NumLock`; com ele desligado, o teclado numérico envia
+setas/Home/End e o app as interpreta como navegação ou teclas desconhecidas.
+
+#### Exemplos
+
+| Entrada | Resultado |
+| --- | --- |
+| `2 + 3 =` | `5` |
+| `0,1 + 0,2 =` | `0,3` |
+| `2 + 3 × 4 =` | `20` (avaliação sequencial) |
+| `200 + 10 % =` | `220` |
+| `200 − 10 % =` | `180` |
+| `200 × 10 % =` | `20` |
+| `200 ÷ 10 % =` | `2000` |
+| `10 %` (sem operação pendente) | `0,1` |
+| `1 ÷ 0 =` | `Erro` / `Divisão por zero` |
+
+Após um erro, digite um número ou pressione `C`/`Delete` para recomeçar.
+
+#### Histórico
+
+- Até 50 operações por sessão; 10 visíveis por vez.
+- Cada operação resolvida vira uma entrada `lhs op rhs = resultado`.
+- `↑` seleciona a entrada mais recente e depois as mais antigas.
+- `↓` avança para entradas mais novas; além da mais recente, limpa a seleção.
+- `Enter` com uma entrada selecionada copia o resultado para o visor, sem criar
+  nova entrada.
+- A fita é reformatada ao trocar o idioma.
+- O histórico existe somente em memória; fechar o app apaga a fita.
+
+#### Opções de linha de comando
+
+```text
+calculadora [OPTIONS]
+
+  --lang <pt|en>                 idioma inicial (padrão: pt)
+  --backend <fb>                 backend de vídeo (v1: somente fb)
+  --fb-device <PATH>             dispositivo (padrão: /dev/fb0)
+  --color <auto|truecolor|256|16|never>
+  --no-animations                desliga fade e reduz o flash
+  --no-audio                     inicia em silêncio
+  --capture-frame <PATH>         gera PNG determinístico e sai
+  -h, --help
+  -V, --version
+```
+
+Exemplos:
 
 ```bash
-./target/release/calculadora \
-  --fb-device /dev/nao-existe \
-  --capture-frame "$tmp/sem-fb.png"
+"$HOME/.local/bin/calculadora" --lang en
+"$HOME/.local/bin/calculadora" --color 256
+"$HOME/.local/bin/calculadora" --color 16
+"$HOME/.local/bin/calculadora" --color never
+NO_COLOR=1 "$HOME/.local/bin/calculadora"
+"$HOME/.local/bin/calculadora" --no-animations --no-audio
 ```
 
-O comando deve terminar com sucesso.
+`NO_COLOR` tem prioridade sobre `--color`. `--color auto` usa truecolor em
+32/24 bpp e 256 cores em 16 bpp. A captura PNG não abre framebuffer, terminal
+interativo nem áudio e pode ser usada em qualquer sessão:
 
-### 3. Portões automatizados
+```bash
+"$HOME/.local/bin/calculadora" --capture-frame /tmp/calculadora.png
+file /tmp/calculadora.png
+```
+
+### Áudio
+
+O áudio é opcional e sintetizado em runtime; não há arquivos de som. O app
+carrega `libasound.so.2` dinamicamente:
+
+- Com ALSA/PipeWire disponível: clique nas teclas aceitas e tom grave em erros.
+- Sem biblioteca ou dispositivo: o rodapé mostra `Som: indisponível` e o app
+  continua funcionando em silêncio.
+- `M` alterna mudo; `--no-audio` inicia mudo.
+
+O binário não exige pacote de desenvolvimento ALSA para rodar. Se quiser áudio
+em uma instalação mínima, instale o pacote ALSA da sua distribuição (por
+exemplo, `libasound2` ou `libasound2t64` no Debian/Ubuntu, `alsa-lib` no
+Fedora/Arch) e garanta um dispositivo de saída configurado.
+
+### Atualizar e desinstalar
+
+Para atualizar, baixe a nova release, confira o `.sha256`, extraia em
+`$HOME/.local/opt` e atualize o symlink `$HOME/.local/bin/calculadora`.
+
+Para desinstalar:
+
+```bash
+rm -f "$HOME/.local/bin/calculadora"
+rm -rf "$HOME/.local/opt/calculadora-1.0.0-linux-x86_64"
+```
+
+Remova também o usuário do grupo `video` se ele não for mais necessário:
+
+```bash
+sudo gpasswd -d "$USER" video
+```
+
+### Solução de problemas
+
+| Sintoma | Causa provável | Ação |
+| --- | --- | --- |
+| `cannot open /dev/fb0: permission denied` | usuário fora de `video` | `sudo usermod -aG video "$USER"`, novo login |
+| `cannot open /dev/fb0: No such file` | sistema sem fbdev | use uma máquina/VM com `/dev/fb0` |
+| `KDSETMODE failed` ou “run from a local virtual console” | terminal em X11/Wayland/SSH | abra um VT local (`Ctrl+Alt+F3`) e execute lá |
+| `stdin is not a TTY` | entrada redirecionada/pipe | execute interativamente no VT |
+| `unsupported framebuffer format` | bpp/bitfields diferentes de 32/24/16 | registre `bits_per_pixel` e o driver do fb |
+| tela não aparece, mas o processo continua | outro VT está ativo | volte ao VT onde o app foi iniciado |
+| teclado numérico não digita | `NumLock` desligado | ative `NumLock` |
+| `Som: indisponível` | sem ALSA/dispositivo | app segue em silêncio; configure PipeWire/ALSA |
+| som não toca | mudo ativo ou `--no-audio` | pressione `M`; confira o marcador no rodapé |
+| captura não cria arquivo | diretório inexistente/sem permissão | use um caminho gravável, como `/tmp/x.png` |
+
+Códigos de saída:
+
+| Código | Significado |
+| ---: | --- |
+| `0` | sucesso (inclui captura e saída normal) |
+| `1` | erro de runtime/IO/captura |
+| `2` | erro de CLI (flag inválida; `tui`/`auto` é rejeitado) |
+| `3` | backend indisponível: fb sem permissão, fora de VT ou stdin não é TTY |
+
+---
+
+## Para desenvolvedores
+
+### Dependências de compilação
+
+| Dependência | Por quê |
+| --- | --- |
+| Linux x86_64 | plataforma oficial do backend fbdev |
+| Rust stable 1.88+ | `rust-version` do crate; release gerado com 1.99.1 |
+| `rustup` | forma recomendada de obter o toolchain |
+| linker C (`cc`/`gcc`) | linkedição do binário Rust |
+| `cargo` | build, testes e xtask |
+| `git` | clonar o repositório |
+| `curl` | instalar o rustup e baixar releases |
+| ALSA runtime (opcional) | testar áudio; a compilação usa `libloading`, não `-dev` |
+| `/dev/fb0` + VT | teste manual real; não é necessário para testes headless |
+
+Não são necessários `libX11`, `libwayland`, `pkg-config`, `libasound2-dev`,
+fontes do sistema ou arquivos de arte externos. As fontes TTF são embutidas no
+binário. O primeiro build baixa as crates do registry e, portanto, precisa de
+rede; o binário final não usa rede em runtime.
+
+Instalação do toolchain:
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+rustup toolchain install stable
+rustc --version
+cargo --version
+```
+
+Exemplos de pacotes de build:
+
+```bash
+# Debian/Ubuntu
+sudo apt update && sudo apt install -y build-essential git curl
+
+# Fedora
+sudo dnf install -y gcc make git curl
+
+# Arch
+sudo pacman -S --needed base-devel git curl
+```
+
+### Compilar e executar
+
+```bash
+git clone https://github.com/danielexpe/calculadora.git
+cd calculadora
+
+cargo build --release
+./target/release/calculadora --version
+```
+
+O binário fica em `target/release/calculadora`. Ele já contém fontes e layout;
+pode ser copiado para outro diretório e executado sem `assets/`.
+
+Para testar no console real:
+
+```bash
+./user_run_now.sh --check   # valida build, fb, grupo, ALSA e captura
+./user_run_now.sh           # execute dentro de um VT local
+```
+
+O script compila a release com áudio, valida `/dev/fb0` e só inicia o app em um
+VT. Use `--no-build` para pular o build e repasse flags normalmente:
+
+```bash
+./user_run_now.sh --color 16 --lang en
+```
+
+### Testes e portões
 
 ```bash
 cargo fmt --all -- --check
@@ -185,166 +389,140 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
-Estado esperado desta versão: **194 testes ativos verdes** — 181 unitários,
-9 de processo/CLI, 1 de capturas douradas, 1 de PTY, 1 de sinais e 1 do xtask —
-além de 2 testes auxiliares `#[ignore]` usados pelos testes de PTY e sinais.
-O clippy deve ficar sem avisos e o manifesto de assets atualizado.
+Estado atual: **194 testes ativos verdes** — 181 unitários, 9 de processo/CLI,
+1 de capturas douradas, 1 de PTY, 1 de sinais e 1 do xtask — além de 2 testes
+auxiliares `#[ignore]` usados pelos testes de PTY/sinais.
 
-Para validar apenas as capturas douradas (16 estados):
+Testes específicos:
+
+```bash
+cargo test --test golden        # 16 capturas douradas por RGBA
+cargo test --test pty_guard     # raw mode em PTY via `script`
+cargo test --test signals       # flag de SIGTERM em processo filho
+cargo test --release            # suíte em otimizado (opcional)
+```
+
+Os testes PTY/sinais são pais que executam os filhos `#[ignore]`; precisam de
+`script` e `kill` no sistema.
+
+#### Capturas douradas
+
+As 16 capturas ficam em `tests/snapshots/` e são comparadas por bytes RGBA:
 
 ```bash
 cargo test --test golden
-# regenerar após revisar a mudança visual:
-UPDATE_SNAPSHOTS=1 cargo test --test golden
+UPDATE_SNAPSHOTS=1 cargo test --test golden   # regenerar após revisão visual
 ```
 
-### 4. Execução em VT local (framebuffer real)
+Sempre revise o diff visual antes de aceitar snapshots novos. Detalhes em
+`docs/05-test-plan.md`.
 
-Pré-requisitos: usuário no grupo `video` após novo login e um VT livre, por
-exemplo `tty3`. Não execute a partir de um terminal dentro de X11/Wayland.
+### Captura PNG e QA sem hardware
 
 ```bash
-# no diretório do projeto, ainda na sessão gráfica
-cargo build --release
+tmp=$(mktemp -d)
+./target/release/calculadora --capture-frame "$tmp/pt.png"
+./target/release/calculadora --lang en --color never \
+  --capture-frame "$tmp/en-mono.png"
 
-# confira device e permissões
-ls -l /dev/fb0
-cat /sys/class/graphics/fb0/name
-cat /sys/class/graphics/fb0/bits_per_pixel
-id -nG
+file "$tmp/pt.png" "$tmp/en-mono.png"
+sha256sum "$tmp/pt.png"
 ```
 
-Troque para o VT livre com `Ctrl+Alt+F3`, faça login e execute:
+Saída esperada: PNG 1344 × 756 RGBA8. Na mesma toolchain, duas capturas iguais
+produzem bytes idênticos. A captura não abre fb, TTY nem áudio; ela é o caminho
+principal de QA em CI/sem console.
 
-```bash
-cd /caminho/para/calculadora
-./target/release/calculadora
-```
-
-O que observar nesta versão:
-
-- A tela inicial deve aparecer centralizada, com a fita vazia, o visor `0` e o
-  keypad.
-- Digite `200 + 10 % =` e confirme `220` no visor e uma entrada na fita.
-- Faça `0,1 + 0,2 =` e confirme `0,3`.
-- Faça `1 ÷ 0 =` e confirme `Erro`/`Divisão por zero`; digite `7` para
-  recuperar.
-- A fita registra as operações; `↑`/`↓` navegam e `Enter` recupera o resultado
-  sem criar nova entrada.
-- `F2` deve trocar `PT`/`EN`, o rodapé, o histórico e o separador decimal.
-- `M` deve alternar `Som: ligado`/`Som: desligado`; com áudio disponível,
-  teclas aceitas devem clicar e `1 ÷ 0 =` deve emitir o tom grave. Sem
-  ALSA/dispositivo, o status deve ser `Som: indisponível` e nada deve quebrar.
-- A nova entrada da fita deve surgir com fade/slide leve; com
-  `--no-animations`, deve aparecer direto.
-- `Q`, `Esc` ou `Ctrl+C` devem sair e devolver o console em modo texto.
-
-Para testar a restauração por sinal, abra outro VT, descubra o PID e envie
-`SIGTERM`:
-
-```bash
-pgrep -n calculadora
-kill -TERM <pid>
-```
-
-O console deve voltar ao modo texto. Evite trocar de VT enquanto o app estiver
-em execução; se isso acontecer, saia e reinicie.
-
-### 5. Checklist rápido de aceite
-
-- [x] `--version` mostra `calculadora 1.0.0`.
-- [x] A captura gera PNG de 1344 × 756.
-- [x] Duas capturas iguais têm o mesmo SHA-256.
-- [x] `--lang en`, `--color never` e `--no-audio` alteram a captura.
-- [x] A captura funciona com `--fb-device` inexistente.
-- [x] Os portões automatizados passam com e sem features.
-- [x] No VT, a tela aparece e o fluxo `200 + 10 % =` mostra `220`.
-- [x] No VT, `↑`/`↓`/`Enter` navegam e recuperam o histórico.
-- [x] No VT, `F2`/`M` funcionam e `Q` restaura o console.
-- [x] No VT, clique/erro são audíveis; sem ALSA o status fica indisponível.
-- [x] No VT, a fita anima com fade e `--no-animations` remove o movimento.
-- [x] No VT, `--color 256`, `--color 16` e `--color never` são legíveis.
-- [x] Sem permissão no fb, a mensagem orienta o grupo `video` (código 3).
-
-## Uso
+### Estrutura do projeto
 
 ```text
-calculadora [OPTIONS]
-
-  --lang <pt|en>                 idioma inicial (padrão: pt)
-  --backend <fb>                 backend de vídeo (v1: somente fb)
-  --fb-device <PATH>             dispositivo (padrão: /dev/fb0)
-  --color <auto|truecolor|256|16|never>
-  --no-animations                reduz movimento
-  --no-audio                     inicia em silêncio
-  --capture-frame <PATH>         gera PNG determinístico e sai
-  -h, --help
-  -V, --version
+src/
+  main.rs / cli.rs        entrada, flags, códigos de saída
+  app.rs                  estado de UI, roteamento, flash/debounce/fade, loop fb
+  input.rs                mapeamento de teclas para Action
+  audio.rs                síntese de clique/erro
+  capture.rs              PNG determinístico
+  core/                   domínio puro (decimal, cálculo, histórico)
+  state/                  sessão (idioma, som, seleção)
+  render/                 cena, layout, texto, blend, compositor fb
+  platform/               fbdev/console/sinais e FFI ALSA
+  theme.rs                paletas truecolor/256/16/mono
+  i18n/                   catálogo pt/en
+  util/                   guardas de TTY/raw mode
+tests/
+  golden.rs               comparação das capturas
+  pty_guard.rs            restauração de raw mode
+  signals.rs              SIGTERM
+  snapshots/              16 PNGs dourados
+assets/fonts/             TTF + textos OFL
+docs/                     especificação, design, testes, decisões, release
+xtask/                    manifesto/verificação de assets
 ```
 
-`NO_COLOR` tem prioridade sobre `--color`. O app nunca tenta detectar
-framebuffer automaticamente: falhas de permissão ou de VT produzem mensagem
-acionável e código de saída `3`. A captura não abre framebuffer, terminal
-interativo nem áudio.
+### Empacotamento
 
-### Teclas nesta versão
+A release oficial é montada a partir do binário release, README, licenças,
+notices, notas e textos OFL. O processo completo e o checklist estão em
+`docs/09-release-checklist.md`. Resumo:
 
-| Tecla | Ação | Estado |
-| --- | --- | --- |
-| `F2` | alterna pt-BR / en | funciona |
-| `M` | liga/desliga o som | funciona |
-| `Q`, `Esc`, `Ctrl+C` | sai e restaura o console | funciona |
-| `0`–`9`, `,`/`.`, `+` `-` `*` `/` | dígitos, separador e operações | funciona |
-| `Enter` ou `=` | calcula; com seleção, recupera o resultado | funciona |
-| `Backspace`, `Delete`/`C`, `S`, `%` | apagar, limpar, sinal e porcentagem | funciona |
-| `↑` / `↓` | navega na fita de histórico | funciona |
+```bash
+cargo build --release
+mkdir -p dist/calculadora-1.0.0-linux-x86_64/licenses
+cp target/release/calculadora dist/calculadora-1.0.0-linux-x86_64/
+cp README.md RELEASE_NOTES.md LICENSE LICENSE-ART THIRD_PARTY_NOTICES.md \
+  dist/calculadora-1.0.0-linux-x86_64/
+cp assets/fonts/OFL-Inter.txt assets/fonts/OFL-JetBrainsMono.txt \
+  dist/calculadora-1.0.0-linux-x86_64/licenses/
 
-## Códigos de saída
+tar -czf dist/calculadora-1.0.0-linux-x86_64.tar.gz \
+  -C dist calculadora-1.0.0-linux-x86_64
+(cd dist && sha256sum calculadora-1.0.0-linux-x86_64.tar.gz \
+  > calculadora-1.0.0-linux-x86_64.tar.gz.sha256)
+```
 
-| Código | Significado |
-| ---: | --- |
-| `0` | sucesso (inclui captura e saída normal) |
-| `1` | erro de runtime/IO/captura (por exemplo, caminho PNG inválido) |
-| `2` | erro de CLI (flag inválida; `--backend tui`/`auto` é rejeitado) |
-| `3` | backend indisponível: fb sem permissão, fora de VT ou stdin não é TTY |
+Antes de publicar, teste o binário extraído em `/tmp` sem `assets/` e valide o
+`.sha256`. O hash do pacote não deve ser colocado nas próprias notas de release.
 
-## Solução de problemas
+### Contribuição
 
-| Mensagem/situação | Causa provável | Ação |
-| --- | --- | --- |
-| `cannot open /dev/fb0: permission denied` | usuário fora de `video` | `sudo usermod -aG video "$USER"`, novo login |
-| `KDSETMODE failed` / `run from a local virtual console` | terminal em X11/Wayland/SSH | use `Ctrl+Alt+F3` e execute no VT |
-| `stdin is not a TTY` | entrada redirecionada | execute interativamente no VT |
-| `unsupported framebuffer format` | bpp/bitfields fora de 32/24/16 esperados | registre driver e saída de `bits_per_pixel` |
-| captura não gera arquivo | diretório inexistente ou sem permissão | use um caminho gravável, como `/tmp/x.png` |
-| `Som: indisponível` | sem `libasound.so.2` ou dispositivo ALSA | app segue em silêncio; verifique ALSA/PipeWire e `M` |
-| som não toca | mudo ativo (`M`) ou `--no-audio` | pressione `M`; confirme o marcador preenchido |
+- Leia `AGENTS.md` e `docs/01-calculadora.md` antes de mudar comportamento.
+- Regras de cálculo, arredondamento, percentual e histórico são congeladas;
+  mudanças exigem ADR em `docs/07-decisions-and-risks.md`.
+- Identificadores/código em inglês; strings de UI exclusivamente no catálogo
+  `src/i18n/strings.rs` (pt-BR/en).
+- Não adicione dependências, rede em runtime ou `unsafe` fora de
+  `src/platform/fb.rs` e `src/platform/audio.rs` sem discussão prévia.
+- Rode todos os portões e revise as capturas douradas antes de abrir PR.
+- Preserve a restauração do console em todos os caminhos de saída.
 
-## Documentação
+Issues e pull requests: https://github.com/danielexpe/calculadora
 
-| Documento | Conteúdo |
-| --- | --- |
-| `framework.md` | template de arquitetura obrigatório |
-| `docs/01-calculadora.md` | escopo, regras de cálculo, fluxos e aceite |
-| `docs/02-technical-spec.md` | arquitetura, crates, CLI, fbdev, desempenho |
-| `docs/03-visual-design.md` | paleta, tipografia, layout, estados e movimento |
-| `docs/04-assets-and-licenses.md` | fontes, pipeline, manifesto e licenças |
-| `docs/05-test-plan.md` | pirâmide de testes, capturas douradas e matriz manual |
-| `docs/06-roadmap.md` | fases e critérios de saída |
-| `docs/07-decisions-and-risks.md` | ADRs, premissas, riscos e questões |
-| `docs/08-i18n-catalog.md` | catálogo de strings pt/en e limites de layout |
-| `docs/09-release-checklist.md` | checklist de release v1.0 |
-| `docs/10-validation-log.md` | ambiente auditado e validações pendentes |
-| `THIRD_PARTY_NOTICES.md` | crates, licenças e créditos |
-| `AGENTS.md` | memória operacional e regras para agentes de IA |
+---
 
-## Licenças
+## Estado, limitações e licenças
 
-- Código: **MIT**.
-- Arte original: **CC BY 4.0**.
-- Fontes: **SIL Open Font License 1.1** (Inter 4.1 e JetBrains Mono 2.304),
-  com textos em `assets/fonts/`.
-- Dependências: ver `THIRD_PARTY_NOTICES.md`.
+**Versão 1.0.0 (2026-10-25).** Fluxo, áudio, histórico, fade, paletas e saída
+foram validados manualmente em VT no alvo `amdgpudrmfb` 1920 × 1080 32 bpp.
 
-Este projeto não faz parte do projeto original que inspirou o `framework.md`;
-apenas reutiliza a forma arquitetônica.
+Limitações conhecidas:
+
+- fbdev apenas; não há TUI, DRM/KMS, X11/Wayland nativo ou suporte a SSH.
+- Sem mouse, persistência, funções científicas ou repetição da última operação.
+- 32 bpp validado; 24/16 bpp e resoluções alternativas têm suporte de código,
+  mas validação de hardware pendente.
+- Sem vsync; troca de VT durante a execução pode deixar resíduos.
+- Áudio depende de ALSA/PipeWire; indisponibilidade não é erro fatal.
+- MSRV declarada 1.88; o release foi gerado com Rust 1.99.1.
+- `SIGHUP`/pânico no console e medições formais de CPU/latência ainda não foram
+  registrados individualmente.
+
+Licenças:
+
+- Código: **MIT** (`LICENSE`).
+- Interface/arte original: **CC BY 4.0** (`LICENSE-ART`).
+- Fontes: **SIL OFL 1.1** (Inter 4.1 e JetBrains Mono 2.304), textos em
+  `assets/fonts/`.
+- Dependências: `THIRD_PARTY_NOTICES.md`.
+
+O projeto usa a forma arquitetônica descrita em `framework.md`, mas não faz
+parte do projeto original que inspirou esse template.

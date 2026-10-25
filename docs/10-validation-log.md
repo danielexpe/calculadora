@@ -247,7 +247,7 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `RELEASE_NOTES.md` e
   textos OFL em `licenses/`; sem `assets/`.
 - SHA-256:
-  `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
+  `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`
   (verificado com `sha256sum -c`).
 - Smoke em `/tmp`: `--version` → `calculadora 1.0.0`; captura 1344 × 756
   determinística; binário roda fora da pasta do projeto.
@@ -369,3 +369,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Fase 5: versão 1.0.0, checklist, RELEASE_NOTES, pacote + sha256, smoke em /tmp |
 | 2026-10-25 | Repositório público criado e `main` publicado | https://github.com/danielexpe/calculadora |
 | 2026-10-25 | GitHub release `v1.0.0` com pacote + sha256 | https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
+| 2026-10-25 | README reescrito e pacote 1.0.0 regenerado para atualizar a release | novo hash `62829f59…` |

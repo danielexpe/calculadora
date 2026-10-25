@@ -205,7 +205,7 @@ Critérios de saída:
 - [x] `AGENTS.md` com hash do pacote, data e pendências.
 
 Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
-`daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`.
+`62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`.
 Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
 
 Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
