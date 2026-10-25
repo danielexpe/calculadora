@@ -9,8 +9,8 @@
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
 3. Verificar `git status` — repositório local em `main`; último commit de
-   feature `73eac45`. Não criar novo commit, push, tag ou release sem pedido
-   explícito.
+   feature `2773796`, remoto público `origin`. Não criar tag ou release sem
+   pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
 5. Não iniciar fase sem pedido explícito; as Fases 0–5 estão concluídas no
    escopo local. Detalhes manuais, 24/16 bpp e release público pendentes.
@@ -34,8 +34,9 @@
 | Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
 | SHA-256 do pacote | `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84` |
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
-| Repositório git | inicializado em `main`; último commit de feature `73eac45` |
-| Commits/releases | 8 commits locais (5 de feature + 3 de registro); nenhum push/release |
+| Repositório git | `main` local; remoto público `origin` (GitHub) |
+| Repositório remoto | https://github.com/danielexpe/calculadora |
+| Commits/releases | `main` publicado no remoto; sem tag/GitHub release |
 
 ## 3. Resumo do produto
 
@@ -99,11 +100,11 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 | # | Pendência | Prazo | Dono |
 | --- | --- | --- | --- |
 | P-06 | Confirmar 24/16 bpp disponíveis ou marcar pendente | Fase 5 | usuário/agente |
-| P-07 | Definir se haverá release público | Fase 5 | usuário |
 | P-08 | Decidir se TUI volta no backlog | Fase 6 | usuário |
 
 P-01/P-02 foram concluídas em 2026-10-25: o usuário entrou no grupo `video`,
-abriu um VT local e reportou a execução inicial como OK. P-03/P-04/P-05 foram
+abriu um VT local e reportou a execução inicial como OK. P-07 foi concluída
+com a criação do repositório público, sem tag/GitHub release. P-03/P-04/P-05 foram
 concluídas na Fase 1 (`rust_decimal` 1.43.0, quatro TTF OFL e licenças
 confirmadas). Na Fase 2, `tiny-skia` 0.12.0, `image` 0.25.10 (feature `png`),
 `libc` 0.2.191 e `bytemuck` 1.25.2 foram aprovados e adicionados. Na Fase 4,
@@ -229,13 +230,16 @@ Não registrar segredos. Não inventar progresso.
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1–5 estão concluídas no escopo local; o pacote v1.0.0 foi gerado e
-  testado em `/tmp`. A execução inicial em VT foi reportada **OK**.
+- As Fases 1–5 estão concluídas; o pacote v1.0.0 foi gerado/testado em `/tmp`
+  e o teste manual completo em VT foi reportado **OK**. O repositório público
+  `https://github.com/danielexpe/calculadora` foi criado com `main` enviado.
 - **Próximo passo (quando solicitado):** detalhar em VT áudio audível,
   latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/`SIGHUP`/
   pânico, `--no-animations`, `--color 256/16/never` e 24/16 bpp.
-- **Pendências de release:** MSRV 1.88 não instalada; 24/16 bpp não validados;
-  release público (P-07) não solicitado. Não criar tag/push sem pedido.
+- **Pendências de release:** MSRV 1.88 não instalada; 24/16 bpp/resoluções
+  alternativas não validados; `SIGHUP`/pânico e medições de CPU/latência não
+  registrados. Tag/GitHub release não foram solicitados. Não criar tag sem
+  pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;

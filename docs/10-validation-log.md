@@ -366,3 +366,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário |
 | 2026-10-25 | Teste manual completo em VT reportado OK (áudio, fluxo, histórico, fade, paletas, saída) |
 | 2026-10-25 | Fase 5: versão 1.0.0, checklist, RELEASE_NOTES, pacote + sha256, smoke em /tmp |
+| 2026-10-25 | Repositório público criado e `main` publicado | https://github.com/danielexpe/calculadora |

@@ -5,6 +5,8 @@
 > O hash do pacote **não** entra nas próprias notas de release (referência
 > circular); ele fica aqui e no `AGENTS.md`.
 
+Repositório público: https://github.com/danielexpe/calculadora
+
 Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
 Hash SHA-256: `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
 

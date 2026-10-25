@@ -208,8 +208,8 @@ Critérios de saída:
 Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
 `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`.
 Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
-formais de CPU/latência, MSRV 1.88 e tag/release público (repositório público
-solicitado).
+formais de CPU/latência e MSRV 1.88. Repositório público criado; tag/GitHub
+release não solicitados.
 
 ## Fase 6 — Backlog
 
