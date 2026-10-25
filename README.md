@@ -4,6 +4,8 @@
 
 Repositório: https://github.com/danielexpe/calculadora
 
+Release: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+
 Calculadora decimal para **console Linux local**, renderizada diretamente no
 framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
 servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e

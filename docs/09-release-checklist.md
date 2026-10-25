@@ -7,6 +7,8 @@
 
 Repositório público: https://github.com/danielexpe/calculadora
 
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+
 Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
 Hash SHA-256: `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
 
@@ -93,7 +95,7 @@ explicitamente pendentes abaixo.
 - [x] `tar.gz` + `.sha256` gerados.
 - [x] `.sha256` verificado no diretório do pacote.
 - [x] Smoke test em `/tmp` sem `assets/`.
-- [ ] Tag/release somente se solicitado — **não solicitado** (repositório público foi solicitado; tag/release não).
+- [x] Tag `v1.0.0` e GitHub release público com `tar.gz` + `.sha256`.
 - [x] Hash e caminho registrados no `AGENTS.md`.
 
 ## Bloqueios conhecidos (2026-10-25)
@@ -103,12 +105,13 @@ explicitamente pendentes abaixo.
 - [x] P-03: resolvido; `rust_decimal` 1.43.0 pinada/testada.
 - [x] P-04: resolvido; fontes OFL baixadas e verificadas.
 - [ ] P-06: 24/16 bpp não confirmados — **pendente**.
-- [x] P-07: repositório público solicitado/criado na conta do usuário; tag/release não solicitados.
+- [x] P-07: repositório público, tag `v1.0.0` e GitHub release publicados.
 - [ ] MSRV 1.88 não instalada no ambiente.
 
 ## Critério de release
 
-O pacote local v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`,
-e o teste manual completo em VT foi reportado OK. 24/16 bpp, resoluções
-alternativas, `SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88
-permanecem explicitamente pendentes.
+O pacote v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`; o
+teste manual completo em VT foi reportado OK; tag e GitHub release públicos
+foram publicados com os dois artefatos. 24/16 bpp, resoluções alternativas,
+`SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88 permanecem
+explicitamente pendentes.

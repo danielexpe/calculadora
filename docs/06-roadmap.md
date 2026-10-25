@@ -207,9 +207,10 @@ Critérios de saída:
 
 Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
 `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`.
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+
 Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
-formais de CPU/latência e MSRV 1.88. Repositório público criado; tag/GitHub
-release não solicitados.
+formais de CPU/latência e MSRV 1.88.
 
 ## Fase 6 — Backlog
 

@@ -36,7 +36,8 @@
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
 | Repositório git | `main` local; remoto público `origin` (GitHub) |
 | Repositório remoto | https://github.com/danielexpe/calculadora |
-| Commits/releases | `main` publicado no remoto; sem tag/GitHub release |
+| GitHub release | `v1.0.0` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
+| Commits/releases | `main` publicado; tag `v1.0.0` e GitHub release com `tar.gz` + `.sha256` |
 
 ## 3. Resumo do produto
 
@@ -232,14 +233,14 @@ Não registrar segredos. Não inventar progresso.
 
 - As Fases 1–5 estão concluídas; o pacote v1.0.0 foi gerado/testado em `/tmp`
   e o teste manual completo em VT foi reportado **OK**. O repositório público
-  `https://github.com/danielexpe/calculadora` foi criado com `main` enviado.
+  `https://github.com/danielexpe/calculadora` foi criado com `main` enviado, e
+  a release `v1.0.0` foi publicada com `tar.gz` + `.sha256`.
 - **Próximo passo (quando solicitado):** detalhar em VT áudio audível,
   latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/`SIGHUP`/
   pânico, `--no-animations`, `--color 256/16/never` e 24/16 bpp.
-- **Pendências de release:** MSRV 1.88 não instalada; 24/16 bpp/resoluções
+- **Pendências técnicas:** MSRV 1.88 não instalada; 24/16 bpp/resoluções
   alternativas não validados; `SIGHUP`/pânico e medições de CPU/latência não
-  registrados. Tag/GitHub release não foram solicitados. Não criar tag sem
-  pedido.
+  registrados. O release público `v1.0.0` já existe; novas tags só com pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;
