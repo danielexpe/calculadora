@@ -121,3 +121,39 @@ fn capture_reports_unwritable_path_with_runtime_code() {
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("/nonexistent/directory/frame.png"));
 }
+
+#[test]
+fn no_color_environment_forces_monochrome_capture() {
+    let env_path = capture_path("no-color-env");
+    let flag_path = capture_path("no-color-flag");
+
+    let with_env = binary()
+        .env("NO_COLOR", "1")
+        .args([
+            "--color",
+            "truecolor",
+            "--capture-frame",
+            env_path.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(with_env.status.success());
+
+    let with_flag = binary()
+        .args([
+            "--color",
+            "never",
+            "--capture-frame",
+            flag_path.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+    assert!(with_flag.status.success());
+
+    assert_eq!(
+        std::fs::read(&env_path).unwrap(),
+        std::fs::read(&flag_path).unwrap()
+    );
+    let _ = std::fs::remove_file(&env_path);
+    let _ = std::fs::remove_file(&flag_path);
+}

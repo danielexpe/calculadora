@@ -193,9 +193,25 @@
   feature `png` encoda a captura; `libc` isola ioctl/mmap/sinais em
   `platform/fb.rs`; `bytemuck` fornece `Pod`/`Zeroable` para a ABI de 160
   bytes. Não foi adicionado pipeline de arte nem `memmap2`.
-- **Consequências:** `unsafe` continua restrito a `platform/fb.rs`; a captura
+- **Consequências:** `unsafe` ficou restrito a `platform/fb.rs` até a Fase 4
+  (D-019 o estende a `platform/audio.rs`); a captura
   não abre fb/tty/áudio; 24/16 bpp têm conversão por bitfield testada; a
   validação em VT real segue bloqueada por P-01/P-02.
+
+### D-019 — ALSA dinâmico e `unsafe` também em `platform/audio.rs`
+
+- **Status:** aceita e implementada na Fase 4.
+- **Contexto:** o áudio opcional exige FFI para `libasound.so.2`; a regra
+  anterior limitava `unsafe` a `platform/fb.rs`. Usar uma crate de áudio nova
+  exigiria aprovação e aumentaria dependências.
+- **Decisão:** toda a FFI ALSA (carregamento dinâmico com `libloading`, abertura
+  do PCM, `set_params`, `writei`, `recover`, `close`) fica em
+  `platform/audio.rs`, com blocos `// SAFETY:`. A síntese e o canal limitado
+  ficam em `src/audio.rs` (seguro). Sem a feature `audio`, o backend é
+  indisponível e silencioso.
+- **Consequências:** `unsafe` passa a ser permitido em `platform/fb.rs` **e**
+  `platform/audio.rs`; ausência de ALSA/dispositivo vira status
+  “Som indisponível”, nunca erro fatal; o loop usa `try_send` e não bloqueia.
 
 ## 2. Premissas
 

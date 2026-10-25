@@ -156,7 +156,7 @@ Coordenadas:
 | `BorderStrong` | `#3A4454` | foco/estado |
 | `TextPrimary` | `#EDEFF3` | números e títulos |
 | `TextSecondary` | `#A2ABBA` | rótulos e expressão |
-| `TextMuted` | `#6F7888` | dicas e vazio |
+| `TextMuted` | `#7D8696` | dicas e vazio |
 | `Accent` | `#5EEAD4` | `=`, seleção, marca |
 | `AccentStrong` | `#2DD4BF` | hover/realce lógico |
 | `OnAccent` | `#07110F` | texto sobre acento |
@@ -192,9 +192,9 @@ Mapeamento inicial (ajustar após capturas):
 | `Border` | 238 |
 | `TextPrimary` | 255 |
 | `TextSecondary` | 250 |
-| `TextMuted` | 244 |
-| `Accent` | 79 |
-| `Operator` | 79 |
+| `TextMuted` | 246 |
+| `Accent` | 86 |
+| `Operator` | 86 |
 | `Warning` | 214 |
 | `Danger` | 203 |
 | `Success` | 78 |
@@ -205,7 +205,7 @@ Mapeamento inicial (ajustar após capturas):
 - Fundo: preto (`0`).
 - Superfícies: preto/cinza (`0`, `8`).
 - Texto: branco/cinza claro (`15`, `7`).
-- Acento: ciano (`14`).
+- Acento: ciano claro (`14`), calibrado para contraste ≥ 10:1 sobre o card.
 - `%`: amarelo (`11`).
 - Erro/AC: vermelho (`9`).
 - Som ligado: verde (`10`).

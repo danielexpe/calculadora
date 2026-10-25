@@ -45,8 +45,9 @@ Regras:
 - `render/scene.rs` descreve a cena em primitivas lógicas; não conhece fbdev.
 - `render/fb.rs` rasteriza a cena e compõe no framebuffer; usa `tiny-skia`,
   `fontdue` e `theme`.
-- `platform/fb.rs` é o único módulo com `unsafe` de sistema (ioctl, `mmap`,
-  sinais), sempre com comentário `// SAFETY:`.
+- `platform/fb.rs` e `platform/audio.rs` concentram o `unsafe` de sistema
+  (ioctl, `mmap`, sinais e FFI ALSA), sempre com comentário `// SAFETY:`.
+  Ver ADR D-019.
 - `capture.rs` usa o mesmo renderizador lógico e grava PNG sem abrir fb/tty.
 - `util/tty.rs` contém guardas de terminal e checagens de TTY, sem estado
   global.
@@ -80,6 +81,7 @@ src/
   platform/
     mod.rs
     fb.rs            # device, console, ioctls, mmap, sinais, guardas
+    audio.rs         # FFI ALSA dinâmica (feature audio)
   audio.rs           # síntese e ALSA dinâmico (feature audio)
   assets.rs          # include_bytes!, decode e cache de fontes
   capture.rs         # PNG determinístico de QA
@@ -133,7 +135,7 @@ xtask = "run --package xtask --"
 | `capture.rs` (PNG 1344 × 756 determinístico) | implementado na Fase 2 |
 | `app.rs` (`App` puro + loop fb, flash, debounce, histórico, saída) | implementado na Fase 3 |
 | `main.rs` | capture e runtime fb ligados; códigos 0/1/2/3 |
-| `audio.rs` | Fase 4 |
+| `audio.rs` | implementado na Fase 4 (síntese + ALSA dinâmico) |
 
 ## 4. Dependências
 
@@ -444,7 +446,7 @@ canal(valor8, offset, len) =
 - Handler apenas marca a flag; restauração ocorre no loop/`Drop`.
 - `Ctrl+C` em raw mode chega como tecla; `input.rs` mapeia para `Quit`.
 - Panic hook restaura console antes de imprimir o erro.
-- `unsafe` apenas em `platform/fb.rs`, com `// SAFETY:`.
+- `unsafe` apenas em `platform/fb.rs` e `platform/audio.rs`, com `// SAFETY:`.
 
 ### 9.6 Limitações documentadas
 
@@ -491,16 +493,19 @@ Mensagens de erro devem conter **causa** e **ação**.
 
 ## 11. Áudio
 
-- Síntese em runtime: clique curto (ruído filtrado + envelope) e tom de erro.
+- Implementado na Fase 4: clique de 22 ms (ruído filtrado com envelope) e tom
+  de erro de 180 ms (140 Hz + harmônico), em 48 kHz mono S16_LE.
 - Sem arquivos de áudio, sem música.
-- Volume padrão 0,32; `M` alterna mudo.
+- Volume padrão 0,32; `M` alterna mudo; `--no-audio` inicia mudo.
 - ALSA carregado dinamicamente (`libasound.so.2` + `libloading`), atrás da
-  feature `audio`.
+  feature `audio`; toda a FFI fica em `platform/audio.rs`.
+- `Audio::start` faz handshake de disponibilidade com timeout de 250 ms.
 - Ausência de biblioteca/dispositivo: silêncio e status “Som indisponível”.
-- Thread separada com canal limitado; nunca bloquear o loop.
-- Eventos: `KeyAccepted` (clique), `Error` (tom grave), `Toggle` (nada).
-- Teste de síntese sem hardware: sem NaN, pico ≤ 1,0, duração esperada,
-  envelope finito.
+- Thread separada com canal limitado (8); `try_send` nunca bloqueia o loop.
+- Eventos: entrada aceita → clique; `CalcEvent::Error` → tom grave; `M`,
+  idioma e navegação não emitem som.
+- Testes sem hardware: duração, determinismo, sem NaN, pico ≤ 1,0 e envelope
+  finito; `Audio::unavailable` é silencioso.
 
 ## 12. i18n e tema
 
@@ -531,7 +536,8 @@ desvios em `docs/10-validation-log.md`.
 
 ## 14. Segurança e robustez
 
-- `unsafe` restrito a `platform/fb.rs`, com `// SAFETY:` e testes de ABI.
+- `unsafe` restrito a `platform/fb.rs` e `platform/audio.rs`, com `// SAFETY:`
+  e testes de ABI/limites.
 - Validar todo valor do driver antes de mapear/escrever.
 - Não logar segredos; não armazenar credenciais.
 - Não executar comandos externos em runtime.

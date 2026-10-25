@@ -7,13 +7,13 @@ framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
 servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e
 suporte a português e inglês.
 
-**Versão inicial 0.1.0 — Fases 1 a 3 concluídas em 2026-10-25 no caminho
-testável sem hardware.** O fluxo completo já funciona: digitação, quatro
-operações, porcentagem, sinal, AC/DEL, erros, fita de histórico com rolagem e
-recall, `F2`, `M`, flash de tecla e debounce de confirmação. A captura PNG e as
-16 capturas douradas estão implementadas. **A execução em VT real continua sem
-validação neste ambiente** (falta permissão no `/dev/fb0` e um VT livre), e o
-áudio/fade de histórico ficam para a Fase 4. Consulte `docs/06-roadmap.md`.
+**Versão inicial 0.1.0 — Fases 1 a 4 concluídas em 2026-10-25.** O fluxo
+completo funciona: digitação, quatro operações, porcentagem, sinal, AC/DEL,
+erros, fita com rolagem/recall, `F2`, `M`, flash, debounce, fade da fita, áudio
+sintetizado com fallback silencioso, paletas e captura PNG com 16 douradas.
+**A execução inicial em VT foi reportada OK em 2026-10-25**; ainda faltam
+registrar áudio audível, latência, CPU ocioso, restauração por cada caminho e
+24/16 bpp. Consulte `docs/06-roadmap.md`.
 
 ## O que funciona agora
 
@@ -22,11 +22,16 @@ validação neste ambiente** (falta permissão no `/dev/fb0` e um VT livre), e o
   exata e avaliação sequencial.
 - Fita com até 50 entradas, 10 visíveis, rolagem orientada pela seleção e recall
   do resultado com `Enter`/`=`.
-- `F2` alterna pt-BR/en (inclusive histórico e separadores); `M` alterna o
-  estado do som; `Q`/`Esc`/`Ctrl+C` saem restaurando o console.
+- `F2` alterna pt-BR/en (inclusive histórico e separadores); `M` alterna mudo;
+  `Q`/`Esc`/`Ctrl+C` saem restaurando o console.
 - Flash de tecla de 90 ms (60 ms com `--no-animations`), debounce de 120 ms em
-  `=`/`Enter` e marcador de som por forma (preenchido/vazado/traço).
-- Paletas truecolor, 256, 16 e monocromática.
+  `=`/`Enter`, fade de 120 ms na nova entrada da fita e marcador de som por
+  forma (preenchido/vazado/traço).
+- Áudio opcional: clique curto para entrada aceita e tom grave para erro, via
+  ALSA dinâmico; sem ALSA/dispositivo o app mostra `Som: indisponível` e segue
+  em silêncio. `--no-audio` inicia mudo.
+- Paletas truecolor, 256, 16 e monocromática, com contraste testado
+  (primário ≥ 7:1, secundário/muted ≥ 4,5:1, acento ≥ 10:1).
 - Captura PNG determinística de 1344 × 756, sem abrir framebuffer, TTY ou áudio.
 - 16 capturas douradas em `tests/snapshots/` cobrindo inicial pt/en, pendência,
   resultado, porcentagem, erro, histórico, seleção, flash, paletas, som e
@@ -36,10 +41,8 @@ validação neste ambiente** (falta permissão no `/dev/fb0` e um VT livre), e o
 
 ## O que ainda não funciona
 
-- Áudio real (clique/erro) e fade de nova entrada da fita (Fase 4). O status de
-  som já é exibido, mas o backend ALSA ainda não foi ligado.
-- Validação em VT real, restauração observada no console e modos 24/16 bpp
-  (Fase 5; bloqueada por permissão e hardware).
+- Validação detalhada em VT: áudio audível, restauração por cada caminho,
+  latência de tecla, CPU ocioso e modos 24/16 bpp (Fase 5).
 - Troca de VT durante a execução pode deixar resíduos; saia do app antes.
 
 ## Visão do produto
@@ -101,6 +104,19 @@ cd /tmp
 cd - >/dev/null
 ```
 
+### 1.1 Atalho automatizado
+
+O script `user_run_now.sh` compila a release com áudio, valida `/dev/fb0`,
+grupos, ALSA e uma captura de sanidade, e só então inicia o app. Fora de um VT
+local ele explica o que fazer e sai com código `3`; use `--check` para validar
+sem abrir o framebuffer.
+
+```bash
+./user_run_now.sh --check
+./user_run_now.sh              # execute dentro do VT local
+./user_run_now.sh --color 16   # flags são repassadas ao app
+```
+
 ### 2. Teste headless (recomendado, não abre framebuffer)
 
 Gere a tela inicial em dois estados:
@@ -148,8 +164,8 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
-Estado esperado desta versão: **182 testes ativos verdes** — 170 unitários,
-8 de processo/CLI, 1 de capturas douradas, 1 de PTY, 1 de sinais e 1 do xtask —
+Estado esperado desta versão: **194 testes ativos verdes** — 181 unitários,
+9 de processo/CLI, 1 de capturas douradas, 1 de PTY, 1 de sinais e 1 do xtask —
 além de 2 testes auxiliares `#[ignore]` usados pelos testes de PTY e sinais.
 O clippy deve ficar sem avisos e o manifesto de assets atualizado.
 
@@ -195,8 +211,11 @@ O que observar nesta versão:
 - A fita registra as operações; `↑`/`↓` navegam e `Enter` recupera o resultado
   sem criar nova entrada.
 - `F2` deve trocar `PT`/`EN`, o rodapé, o histórico e o separador decimal.
-- `M` deve alternar `Som: ligado`/`Som: desligado` (o áudio real chega na
-  Fase 4).
+- `M` deve alternar `Som: ligado`/`Som: desligado`; com áudio disponível,
+  teclas aceitas devem clicar e `1 ÷ 0 =` deve emitir o tom grave. Sem
+  ALSA/dispositivo, o status deve ser `Som: indisponível` e nada deve quebrar.
+- A nova entrada da fita deve surgir com fade/slide leve; com
+  `--no-animations`, deve aparecer direto.
 - `Q`, `Esc` ou `Ctrl+C` devem sair e devolver o console em modo texto.
 
 Para testar a restauração por sinal, abra outro VT, descubra o PID e envie
@@ -221,6 +240,9 @@ em execução; se isso acontecer, saia e reinicie.
 - [ ] No VT, a tela aparece e o fluxo `200 + 10 % =` mostra `220`.
 - [ ] No VT, `↑`/`↓`/`Enter` navegam e recuperam o histórico.
 - [ ] No VT, `F2`/`M` funcionam e `Q` restaura o console.
+- [ ] No VT, clique/erro são audíveis; sem ALSA o status fica indisponível.
+- [ ] No VT, a fita anima com fade e `--no-animations` remove o movimento.
+- [ ] No VT, `--color 256`, `--color 16` e `--color never` são legíveis.
 - [ ] Sem permissão no fb, a mensagem orienta o grupo `video` (código 3).
 
 ## Uso
@@ -249,7 +271,7 @@ interativo nem áudio.
 | Tecla | Ação | Estado |
 | --- | --- | --- |
 | `F2` | alterna pt-BR / en | funciona |
-| `M` | liga/desliga o estado do som | funciona (áudio na Fase 4) |
+| `M` | liga/desliga o som | funciona |
 | `Q`, `Esc`, `Ctrl+C` | sai e restaura o console | funciona |
 | `0`–`9`, `,`/`.`, `+` `-` `*` `/` | dígitos, separador e operações | funciona |
 | `Enter` ou `=` | calcula; com seleção, recupera o resultado | funciona |
@@ -274,6 +296,8 @@ interativo nem áudio.
 | `stdin is not a TTY` | entrada redirecionada | execute interativamente no VT |
 | `unsupported framebuffer format` | bpp/bitfields fora de 32/24/16 esperados | registre driver e saída de `bits_per_pixel` |
 | captura não gera arquivo | diretório inexistente ou sem permissão | use um caminho gravável, como `/tmp/x.png` |
+| `Som: indisponível` | sem `libasound.so.2` ou dispositivo ALSA | app segue em silêncio; verifique ALSA/PipeWire e `M` |
+| som não toca | mudo ativo (`M`) ou `--no-audio` | pressione `M`; confirme o marcador preenchido |
 
 ## Documentação
 

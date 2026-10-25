@@ -33,7 +33,7 @@
 - [ ] Fuzz determinístico sem panic.
 - [ ] MSRV 1.88 verificada (se possível).
 - [ ] `THIRD_PARTY_NOTICES.md` confere com `cargo metadata`.
-- [ ] Nenhum `unsafe` fora de `platform/fb.rs`.
+- [ ] Nenhum `unsafe` fora de `platform/fb.rs` e `platform/audio.rs`.
 - [ ] Nenhum log na tela.
 
 ## Manual em hardware

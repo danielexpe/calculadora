@@ -22,15 +22,15 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–3 implementadas; fluxo completo no headless; áudio na Fase 4 |
+| Código de produção | Fases 1–4 implementadas; execução inicial em VT reportada OK |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
-| Fase 2 — Substrato fb | **concluída no headless** (2026-10-25); VT/fb real pendente |
-| Testes | 182 ativos verdes (170 unitários + 8 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
+| Fase 2 — Substrato fb | **concluída** (2026-10-25); VT inicial reportado OK |
+| Testes | 194 ativos verdes (181 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
 | Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
-| Fase 3 — Fluxo funcional | **concluída no headless** (2026-10-25); VT pendente |
-| Fase 4 — Acabamento | pendente |
+| Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT inicial reportado OK |
+| Fase 4 — Acabamento | **concluída** (2026-10-25); detalhes de áudio/latência/24-16 pendentes |
 | Fase 5 — Release | pendente |
-| Validação em hardware | **pendente** (grupo `video` e VT) |
+| Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
 | Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65` |
 | Commits/releases | 4 commits locais (`ed07e19`, `7923129`, `f691b0c`, `ab0dd65`); nenhum push/release |
 
@@ -95,20 +95,21 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 
 | # | Pendência | Prazo | Dono |
 | --- | --- | --- | --- |
-| P-01 | Adicionar `daniel` ao grupo `video` e relogar | antes de validar fb | usuário |
-| P-02 | Escolher VT local livre (ex.: tty3) | antes da validação em fb | usuário |
 | P-06 | Confirmar 24/16 bpp disponíveis ou marcar pendente | Fase 5 | usuário/agente |
 | P-07 | Definir se haverá release público | Fase 5 | usuário |
 | P-08 | Decidir se TUI volta no backlog | Fase 6 | usuário |
 
-P-03/P-04/P-05 foram concluídas na Fase 1 (`rust_decimal` 1.43.0, quatro TTF
-OFL e licenças confirmadas). Na Fase 2, `tiny-skia` 0.12.0, `image` 0.25.10
-(feature `png`), `libc` 0.2.191 e `bytemuck` 1.25.2 foram aprovados e
-adicionados. Bloqueios de hardware não podem ser declarados validados.
+P-01/P-02 foram concluídas em 2026-10-25: o usuário entrou no grupo `video`,
+abriu um VT local e reportou a execução inicial como OK. P-03/P-04/P-05 foram
+concluídas na Fase 1 (`rust_decimal` 1.43.0, quatro TTF OFL e licenças
+confirmadas). Na Fase 2, `tiny-skia` 0.12.0, `image` 0.25.10 (feature `png`),
+`libc` 0.2.191 e `bytemuck` 1.25.2 foram aprovados e adicionados. Na Fase 4,
+`libloading` foi usado para ALSA. Detalhes de 24/16 bpp, áudio audível,
+latência e restauração por caminho continuam pendentes.
 
 ## 7. Comandos e portões
 
-Portões atuais (Fase 3 verde):
+Portões atuais (Fase 4 verde):
 
 ```bash
 cargo fmt --all -- --check
@@ -132,13 +133,14 @@ cargo test --test pty_guard --test signals
 # raw mode em PTY e flag de SIGTERM (processos filhos)
 ```
 
-Validação em VT (ainda bloqueada por P-01/P-02):
+Validação em VT (execução inicial reportada OK em 2026-10-25; detalhes
+pendentes):
 
 ```bash
 ls -l /dev/fb0
 cat /sys/class/graphics/fb0/name
 id -nG
-./target/release/calculadora
+./user_run_now.sh
 ```
 
 Ambiente auditado em 2026-10-25:
@@ -149,11 +151,11 @@ Ambiente auditado em 2026-10-25:
 - Sessão atual em Wayland no tty2; `/dev/tty` não é TTY no shell atual.
 - `rust_decimal` 1.43.0 baixada e pinada no `Cargo.lock`.
 - Fontes Inter 4.1 e JetBrains Mono 2.304 baixadas, com hashes registrados.
-- Fases 2–3 implementadas: fbdev, console/sinais, tema, cena/texto, captura,
-  `App` completo, flash/debounce, histórico/recall e 16 capturas douradas.
-  Binário release ~3,4 MB.
-- Áudio e fade de histórico ficam na Fase 4.
-- Fluxo e capturas validados no headless; execução em VT real **não** validada.
+- Fases 2–4 implementadas: fbdev, console/sinais, tema, cena/texto, captura,
+  `App` completo, flash/debounce/fade, histórico/recall, 16 capturas douradas,
+  áudio ALSA dinâmico com fallback e contraste testado. Binário ~3,6 MB.
+- Fluxo, capturas, áudio sintetizado e fade validados no headless; execução,
+  áudio audível e latência em VT real **não** validados.
 
 ## 8. Regras de trabalho do agente
 
@@ -161,12 +163,13 @@ Ambiente auditado em 2026-10-25:
 - Não reimplementar fases concluídas; não iniciar fase sem pedido.
 - Não reabrir decisão congelada; propor ADR.
 - Não adicionar dependência/rede sem aprovação explícita. Aprovadas:
-  `rust_decimal`, as fontes, e na Fase 2 `tiny-skia`, `image`, `libc` e
-  `bytemuck`.
+  `rust_decimal`, as fontes, `libc`/`bytemuck`/`tiny-skia`/`image` (Fase 2) e
+  `libloading` (áudio opcional da Fase 4, já previsto no `Cargo.toml`).
 - Não fazer commit, push, amend, PR ou configurar remote sem pedido.
 - Não criar commit, push, tag ou release sem pedido; o repositório local já
   existe.
-- Manter `unsafe` só em `platform/fb.rs`, com `// SAFETY:`.
+- Manter `unsafe` só em `platform/fb.rs` e `platform/audio.rs`, com `// SAFETY:`
+  (ADR D-019).
 - Testar antes de declarar concluído; rodar todos os portões.
 - Não inventar validação manual; registrar “pendente” e o que falta.
 - Preservar terminal/console em sucesso, erro, pânico e sinais.
@@ -204,6 +207,9 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `f691b0c` |
 | 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | `f691b0c` |
 | 2026-10-25 | Fase 3: `App` (input→cálculo→cena, histórico/recall, flash, debounce), marcador de som, rolagem da fita, 16 capturas douradas, testes PTY/sinais e README atualizado; 182 testes ativos + 2 auxiliares | `src/app.rs`, `src/input.rs`, `src/capture.rs`, `src/render/scene.rs`, `src/render/layout.rs`, `tests/golden.rs`, `tests/pty_guard.rs`, `tests/signals.rs`, `tests/snapshots/**`, `README.md`, `docs/**`, `AGENTS.md` | `ab0dd65` |
+| 2026-10-25 | Fase 4: áudio sintetizado + ALSA dinâmico (feature audio), fade de 120 ms, contraste/paletas corrigidos, compositor com fundo em cache, 16 douradas regeneradas e README/docs atualizados; 194 testes ativos + 2 auxiliares | `src/audio.rs`, `src/platform/audio.rs`, `src/app.rs`, `src/theme.rs`, `src/render/fb.rs`, `src/render/scene.rs`, `tests/cli_process.rs`, `tests/snapshots/**`, `Cargo.toml`, `README.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | pendente (sem commit) |
 
 ## 11. Fases
 
@@ -212,19 +218,21 @@ Não registrar segredos. Não inventar progresso.
 | 0 | especificação e planejamento | concluída |
 | 1 | fundação pura, CLI, i18n, input, testes | **concluída** |
 | 2 | fbdev, console, texto, cena, captura | **concluída (headless)**; VT pendente |
-| 3 | fluxo completo, histórico, capturas douradas | **concluída (headless)**; VT pendente |
-| 4 | tema, som, a11y, desempenho | pendente |
+| 3 | fluxo completo, histórico, capturas douradas | **concluída**; VT inicial OK |
+| 4 | tema, som, a11y, desempenho | **concluída**; detalhes em VT pendentes |
 | 5 | validação em VT, pacote, docs | pendente |
 | 6 | backlog (TUI, DRM/KMS, persistência) | não iniciado |
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1–3 estão concluídas no que é testável sem hardware. Aguardar
-  pedido explícito para iniciar a Fase 4 (áudio ALSA, fade de histórico,
-  paletas 256/16/mono ponta a ponta, a11y e desempenho).
-- Antes de validar em fb: confirmar P-01/P-02 com o usuário.
-- O `app.rs` atual tem `App` puro + loop fb; cálculo, histórico/recall, `F2`,
-  `M`, flash de 90 ms e debounce de 120 ms já estão ligados.
+- As Fases 1–4 estão implementadas e a execução inicial em VT foi reportada
+  **OK** pelo usuário (2026-10-25). A Fase 5 (validação detalhada, pacote e
+  release) só começa com pedido explícito.
+- **Próximo passo (quando solicitado):** detalhar em VT áudio audível,
+  latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico,
+  `--no-animations`, `--color 256/16/never` e 24/16 bpp.
+- Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
+  “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;
   regenerar com `UPDATE_SNAPSHOTS=1 cargo test --test golden` e revisar.
 - Em VT, validar 32 bpp primeiro; registrar 24/16 bpp como pendentes se não

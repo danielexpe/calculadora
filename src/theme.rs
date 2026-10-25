@@ -62,7 +62,7 @@ impl Theme {
             border_strong: Rgba8::hex(0x3A4454),
             text_primary: Rgba8::hex(0xEDEFF3),
             text_secondary: Rgba8::hex(0xA2ABBA),
-            text_muted: Rgba8::hex(0x6F7888),
+            text_muted: Rgba8::hex(0x7D8696),
             accent: Rgba8::hex(0x5EEAD4),
             accent_strong: Rgba8::hex(0x2DD4BF),
             on_accent: Rgba8::hex(0x07110F),
@@ -91,11 +91,11 @@ impl Theme {
             border_strong: xterm256(240),
             text_primary: xterm256(255),
             text_secondary: xterm256(250),
-            text_muted: xterm256(244),
-            accent: xterm256(79),
-            accent_strong: xterm256(80),
+            text_muted: xterm256(246),
+            accent: xterm256(86),
+            accent_strong: xterm256(87),
             on_accent: xterm256(232),
-            operator: xterm256(79),
+            operator: xterm256(86),
             operator_bg: xterm256(236),
             operator_border: xterm256(239),
             warning: xterm256(214),
@@ -121,12 +121,12 @@ impl Theme {
             text_primary: Rgba8::new(255, 255, 255, 255),
             text_secondary: Rgba8::new(192, 192, 192, 255),
             text_muted: Rgba8::new(150, 150, 150, 255),
-            accent: Rgba8::new(0, 200, 200, 255),
-            accent_strong: Rgba8::new(0, 230, 230, 255),
+            accent: Rgba8::new(0, 230, 230, 255),
+            accent_strong: Rgba8::new(0, 255, 255, 255),
             on_accent: Rgba8::new(0, 0, 0, 255),
-            operator: Rgba8::new(0, 200, 200, 255),
+            operator: Rgba8::new(0, 230, 230, 255),
             operator_bg: Rgba8::new(0, 32, 32, 255),
-            operator_border: Rgba8::new(0, 100, 100, 255),
+            operator_border: Rgba8::new(0, 120, 120, 255),
             warning: Rgba8::new(255, 200, 0, 255),
             danger: Rgba8::new(255, 80, 80, 255),
             success: Rgba8::new(0, 200, 80, 255),
@@ -254,6 +254,60 @@ mod tests {
         assert_eq!(Theme::truecolor().canvas, Rgba8::hex(0x0B0D11));
         assert_eq!(Theme::truecolor().accent, Rgba8::hex(0x5EEAD4));
         assert_eq!(Theme::mono().accent, Rgba8::new(255, 255, 255, 255));
+    }
+
+    fn relative_luminance(color: Rgba8) -> f64 {
+        let channel = |value: u8| {
+            let value = value as f64 / 255.0;
+            if value <= 0.039_28 {
+                value / 12.92
+            } else {
+                ((value + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b)
+    }
+
+    fn contrast(a: Rgba8, b: Rgba8) -> f64 {
+        let first = relative_luminance(a);
+        let second = relative_luminance(b);
+        let (high, low) = if first > second {
+            (first, second)
+        } else {
+            (second, first)
+        };
+        (high + 0.05) / (low + 0.05)
+    }
+
+    #[test]
+    fn palettes_meet_documented_contrast_targets() {
+        for theme in [
+            Theme::truecolor(),
+            Theme::color256(),
+            Theme::color16(),
+            Theme::mono(),
+        ] {
+            assert!(
+                contrast(theme.text_primary, theme.card) >= 7.0,
+                "primary contrast"
+            );
+            assert!(
+                contrast(theme.text_secondary, theme.card) >= 4.5,
+                "secondary contrast"
+            );
+            assert!(
+                contrast(theme.text_muted, theme.card) >= 4.5,
+                "muted contrast"
+            );
+            assert!(
+                contrast(theme.accent, theme.card) >= 10.0,
+                "accent contrast"
+            );
+            assert!(
+                contrast(theme.on_accent, theme.accent) >= 4.5,
+                "on-accent contrast"
+            );
+        }
     }
 
     #[test]

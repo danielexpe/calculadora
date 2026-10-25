@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use crossterm::event::{self, Event};
 use thiserror::Error;
 
+use crate::audio::{Audio, SoundEvent};
 use crate::cli::Cli;
 use crate::core::{CalcAction, CalcEvent, Calculator};
 use crate::i18n::{Lang, SoundStatus};
@@ -11,7 +12,7 @@ use crate::input::{map_key, Action};
 use crate::platform::fb::{
     install_panic_hook, install_signal_handlers, quit_requested, ConsoleGuard, Framebuffer,
 };
-use crate::render::fb::compose_device;
+use crate::render::fb::Compositor;
 use crate::render::layout::{self, KeyId};
 use crate::render::scene::{calculator_scene, CalculatorView, Scene};
 use crate::render::text::TextEngine;
@@ -24,6 +25,7 @@ const ANIMATION_TIMEOUT: Duration = Duration::from_millis(16);
 const CONFIRM_DEBOUNCE: Duration = Duration::from_millis(120);
 const FLASH_DURATION: Duration = Duration::from_millis(90);
 const FLASH_REDUCED: Duration = Duration::from_millis(60);
+const HISTORY_FADE: Duration = Duration::from_millis(120);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Outcome {
@@ -38,14 +40,22 @@ struct Flash {
     started: Instant,
 }
 
+#[derive(Debug, Clone, Copy)]
+struct FadeAnimation {
+    started: Instant,
+    progress: f32,
+}
+
 pub struct App {
     calculator: Calculator,
     session: SessionState,
     animations: bool,
     sound: SoundStatus,
     flash: Option<Flash>,
+    history_fade: Option<FadeAnimation>,
     last_confirm: Option<Instant>,
     last_event: CalcEvent,
+    sound_request: Option<SoundEvent>,
 }
 
 impl App {
@@ -64,8 +74,10 @@ impl App {
                 SoundStatus::On
             },
             flash: None,
+            history_fade: None,
             last_confirm: None,
             last_event: CalcEvent::Ignored,
+            sound_request: None,
         }
     }
 
@@ -94,17 +106,42 @@ impl App {
     }
 
     pub fn is_animating(&self) -> bool {
-        self.flash.is_some()
+        self.flash.is_some() || self.history_fade.is_some()
+    }
+
+    pub fn history_fade(&self) -> Option<f32> {
+        self.history_fade.map(|fade| fade.progress)
+    }
+
+    pub fn take_sound_request(&mut self) -> Option<SoundEvent> {
+        self.sound_request.take()
     }
 
     pub fn update(&mut self, now: Instant) -> bool {
+        let mut changed = false;
+
         if let Some(flash) = self.flash {
             if now.saturating_duration_since(flash.started) >= self.flash_duration() {
                 self.flash = None;
-                return true;
+                changed = true;
             }
         }
-        false
+
+        if let Some(fade) = self.history_fade {
+            let progress = now.saturating_duration_since(fade.started).as_secs_f32()
+                / HISTORY_FADE.as_secs_f32();
+            if progress >= 1.0 {
+                self.history_fade = None;
+            } else {
+                self.history_fade = Some(FadeAnimation {
+                    started: fade.started,
+                    progress,
+                });
+            }
+            changed = true;
+        }
+
+        changed
     }
 
     pub fn handle(&mut self, action: Action) -> Outcome {
@@ -152,6 +189,7 @@ impl App {
                         key: KeyId::Equals,
                         started: now,
                     });
+                    self.sound_request = Some(SoundEvent::Click);
                     return Outcome::Changed;
                 }
                 return self.dispatch(CalcAction::Equals, KeyId::Equals, now);
@@ -185,6 +223,7 @@ impl App {
             selection,
             sound: self.sound,
             pressed: self.pressed_key(),
+            history_fade: self.history_fade(),
         };
         calculator_scene(&view)
     }
@@ -198,11 +237,28 @@ impl App {
     }
 
     fn dispatch(&mut self, action: CalcAction, key: KeyId, now: Instant) -> Outcome {
+        let before_len = self.calculator.history().len();
+        let before_last = self.calculator.history().last().cloned();
         let event = self.calculator.handle(action);
         self.last_event = event;
+
         if event == CalcEvent::Ignored {
             return Outcome::Unchanged;
         }
+
+        let after = self.calculator.history();
+        let pushed = after.len() > before_len || after.last().cloned() != before_last;
+        if pushed && self.animations {
+            self.history_fade = Some(FadeAnimation {
+                started: now,
+                progress: 0.0,
+            });
+        }
+
+        self.sound_request = Some(match event {
+            CalcEvent::Error(_) => SoundEvent::Error,
+            _ => SoundEvent::Click,
+        });
         self.flash = Some(Flash { key, started: now });
         Outcome::Changed
     }
@@ -289,20 +345,32 @@ pub fn run_fb(cli: &Cli) -> Result<(), RunError> {
     install_panic_hook();
     install_signal_handlers().map_err(backend)?;
 
-    let console = ConsoleGuard::enter().map_err(backend)?;
-    let raw = RawModeGuard::enter().map_err(backend)?;
-
     let bpp = framebuffer.info().format.bpp;
     let theme = Theme::new(cli.effective_color_from_env(), bpp);
     let engine = TextEngine::new().map_err(|error| RunError::Runtime(error.to_string()))?;
     let mut app = App::new(cli.lang, cli.no_audio, !cli.no_animations);
+    let audio = Audio::start();
+    if !audio.is_available() {
+        app.set_sound_status(SoundStatus::Unavailable);
+    }
 
-    draw(&mut framebuffer, &engine, &theme, &app)?;
+    let info = *framebuffer.info();
+    let compositor = Compositor::new(
+        &app.scene(&theme).background,
+        info.width,
+        info.height,
+        layout::scale_for(info.width, info.height),
+    );
+
+    let console = ConsoleGuard::enter().map_err(backend)?;
+    let raw = RawModeGuard::enter().map_err(backend)?;
+
+    draw(&mut framebuffer, &engine, &theme, &app, &compositor)?;
 
     while !quit_requested() {
         let now = Instant::now();
         if app.update(now) {
-            draw(&mut framebuffer, &engine, &theme, &app)?;
+            draw(&mut framebuffer, &engine, &theme, &app, &compositor)?;
         }
 
         let timeout = app.timeout();
@@ -320,9 +388,15 @@ pub fn run_fb(cli: &Cli) -> Result<(), RunError> {
             Err(error) => return Err(runtime(error)),
         };
 
-        match app.handle_at(map_key(key), Instant::now()) {
+        let outcome = app.handle_at(map_key(key), Instant::now());
+        if let Some(event) = app.take_sound_request() {
+            if !app.session().muted() {
+                let _ = audio.play(event);
+            }
+        }
+        match outcome {
             Outcome::Quit => break,
-            Outcome::Changed => draw(&mut framebuffer, &engine, &theme, &app)?,
+            Outcome::Changed => draw(&mut framebuffer, &engine, &theme, &app, &compositor)?,
             Outcome::Unchanged => {}
         }
     }
@@ -337,10 +411,9 @@ fn draw(
     engine: &TextEngine,
     theme: &Theme,
     app: &App,
+    compositor: &Compositor,
 ) -> Result<(), RunError> {
-    let info = *framebuffer.info();
-    let scale = layout::scale_for(info.width, info.height);
-    let pixmap = compose_device(&app.scene(theme), engine, info.width, info.height, scale);
+    let pixmap = compositor.compose(&app.scene(theme), engine);
     framebuffer.present(pixmap.data()).map_err(runtime)
 }
 
@@ -545,6 +618,71 @@ mod tests {
         app.handle_at(Action::Digit('7'), now);
         assert_eq!(value(&app), "7");
         assert_eq!(app.pressed_key(), Some(KeyId::Digit('7')));
+    }
+
+    #[test]
+    fn sound_requests_follow_accepted_and_error_events() {
+        let now = at(0);
+        let mut app = app();
+        assert_eq!(app.handle_at(Action::Backspace, now), Outcome::Unchanged);
+        assert_eq!(app.take_sound_request(), None);
+
+        app.handle_at(Action::Digit('1'), now);
+        assert_eq!(app.take_sound_request(), Some(SoundEvent::Click));
+
+        app.handle_at(Action::Operator(Operator::Div), now);
+        app.handle_at(Action::Digit('0'), now);
+        app.handle_at(Action::Equals, now);
+        assert_eq!(app.take_sound_request(), Some(SoundEvent::Error));
+
+        app.handle_at(Action::Digit('7'), now);
+        assert_eq!(app.take_sound_request(), Some(SoundEvent::Click));
+        assert_eq!(app.take_sound_request(), None);
+    }
+
+    #[test]
+    fn recall_requests_click_without_history_growth() {
+        let now = at(0);
+        let mut app = app();
+        digits(&mut app, "2", now);
+        app.handle_at(Action::Operator(Operator::Add), now);
+        digits(&mut app, "3", now);
+        app.handle_at(Action::Equals, now);
+        app.update(at(200));
+        app.take_sound_request();
+        let history_len = app.calculator().history().len();
+
+        app.handle_at(Action::HistoryPrev, at(200));
+        app.handle_at(Action::Equals, at(400));
+        assert_eq!(app.take_sound_request(), Some(SoundEvent::Click));
+        assert_eq!(app.calculator().history().len(), history_len);
+    }
+
+    #[test]
+    fn history_fade_animates_and_expires() {
+        let now = at(0);
+        let mut app = app();
+        digits(&mut app, "2", now);
+        app.handle_at(Action::Operator(Operator::Add), now);
+        digits(&mut app, "3", now);
+        app.handle_at(Action::Equals, now);
+        assert_eq!(app.history_fade(), Some(0.0));
+        assert!(app.update(at(60)));
+        let progress = app.history_fade().expect("fade still active");
+        assert!((0.4..=0.7).contains(&progress), "progress = {progress}");
+        assert!(app.update(at(200)));
+        assert_eq!(app.history_fade(), None);
+    }
+
+    #[test]
+    fn no_animations_disables_history_fade() {
+        let now = at(0);
+        let mut app = App::new(Lang::Pt, false, false);
+        digits(&mut app, "2", now);
+        app.handle_at(Action::Operator(Operator::Add), now);
+        digits(&mut app, "3", now);
+        app.handle_at(Action::Equals, now);
+        assert_eq!(app.history_fade(), None);
     }
 
     #[test]

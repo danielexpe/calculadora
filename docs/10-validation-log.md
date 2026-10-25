@@ -147,10 +147,14 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | Capturas douradas RGBA (16 estados) | verde | `cargo test --test golden` |
 | 2026-10-25 | Raw mode restaurado em PTY | verde | `tests/pty_guard.rs` via `script` |
 | 2026-10-25 | `SIGTERM` marca flag de saída | verde | `tests/signals.rs` em processo filho |
-| — | Execução em `/dev/fb0` em VT | **PENDENTE** | P-01/P-02: grupo `video` e VT livre |
+| 2026-10-25 | Fase 4: áudio sintetizado, ALSA dinâmico, fade, contraste e compositor | verde | 194 testes ativos; 2 auxiliares `#[ignore]` |
+| 2026-10-25 | Síntese de áudio sem hardware | verde | durações 22/180 ms; pico ≤ VOLUME; determinística |
+| 2026-10-25 | Backend ALSA com fallback | verde | handshake < 400 ms; indisponível = silêncio |
+| 2026-10-25 | Contraste das 4 paletas | verde | primário ≥ 7:1; secundário/muted ≥ 4,5:1; acento ≥ 10:1 |
+| 2026-10-25 | Execução em `/dev/fb0` em VT | **OK (reportado pelo usuário)** | `amdgpudrmfb` 1920 × 1080 32 bpp; app iniciou e operou no VT |
 | — | 24 bpp / 16 bpp | **PENDENTE** | hardware/VM não confirmados |
-| — | Áudio real | **PENDENTE** | Fase 4 |
-| — | Restauração de console | **PENDENTE** | implementada com RAII/sinais/panic; falta VT real |
+| — | Áudio real ouvido em VT | **PENDENTE** | backend implementado; confirmar clique/erro no teste detalhado |
+| — | Restauração de console (detalhe) | **PARCIAL** | app executou em VT; falta registrar `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico um a um |
 
 ## 3.1 Evidência da Fase 2 (headless)
 
@@ -199,22 +203,52 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   observado no console, panic induzido em VT, latência de tecla e áudio.
 - Nenhum framebuffer/tty foi aberto pelos testes headless.
 
+## 3.3 Evidência da Fase 4 (headless)
+
+- Síntese em `src/audio.rs`: clique de 22 ms e erro de 180 ms, 48 kHz mono;
+  testes cobrem duração, determinismo, finitude e pico.
+- ALSA dinâmico em `platform/audio.rs` (feature `audio`), com handshake de
+  disponibilidade e `try_send`; sem lib/dispositivo o status é
+  “Som indisponível” e o app continua.
+- Fade de 120 ms na nova entrada da fita; `--no-animations` remove o fade e
+  reduz o flash para 60 ms.
+- Contraste corrigido e testado: `TextMuted` truecolor `#7D8696`; 256 usa
+  índices 246 (muted) e 86 (acento/operador); 16 usa ciano calibrado.
+- `NO_COLOR=1` produz captura idêntica a `--color never` (teste de processo).
+- Release: versão ~0,00 s; captura ~40 ms; suíte dourada de 16 quadros ~0,24 s
+  (~15 ms/quadro, indicativo); RSS da captura ~39 MB; binário 3,6 MB.
+- **Pendente em VT:** ouvir clique/erro, avaliar latência de tecla, CPU ocioso,
+  frame/ocioso em 1080p e restauração visual do console.
+
+## 3.4 Validação manual em VT — 2026-10-25
+
+- Ambiente: `amdgpudrmfb`, 1920 × 1080, 32 bpp, VT local; usuário passou a
+  integrar o grupo `video` e executou a partir do VT.
+- Comando: `./user_run_now.sh`.
+- Resultado reportado pelo usuário: **OK** (“funcionando ok dentro do VT”).
+- Escopo registrado: inicialização e operação do app no console real.
+- **Ainda não detalhado:** áudio audível, latência de tecla, CPU ocioso,
+  restauração por cada caminho (`Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico),
+  `SIGHUP`, 24/16 bpp e resoluções alternativas. Não tratar como validados.
+
 ## 4. Bloqueios ativos
 
 | ID | Bloqueio | O que falta | Dono |
 | --- | --- | --- | --- |
-| B-01 | Sem permissão no fb | `sudo usermod -aG video "$USER"` + novo login (ou `newgrp video`) | usuário |
-| B-02 | Sessão Wayland no tty2 | escolher VT livre (ex.: tty3) e executar a partir dele | usuário |
 | B-05 | 24/16 bpp não confirmados | testar em hardware/VM ou marcar pendente no release | usuário/agente |
 
 Resolvidos na Fase 1:
 
 - B-03: `rust_decimal` 1.43.0 baixada, pinada e registrada.
 - B-04: quatro TTF OFL e textos de licença baixados e verificados.
-- Binário ainda é placeholder; fb/captura não são bloqueios de hardware, são
-  escopo da Fase 2.
 
-Nenhum bloqueio de hardware foi declarado validado.
+Resolvidos na validação inicial em VT (2026-10-25):
+
+- B-01: usuário entrou no grupo `video`.
+- B-02: execução feita em VT local, fora da sessão Wayland.
+
+B-01/B-02 estão resolvidos; 24/16 bpp e os detalhes de áudio/latência/restauração
+seguem pendentes.
 
 ## 5. Procedimento de validação futura
 
@@ -279,17 +313,17 @@ Seguir `docs/05-test-plan.md`, seção 9. Registrar cada item como
 
 | Métrica | Alvo | Medido | Data/ambiente |
 | --- | --- | --- | --- |
-| Startup | < 400 ms | — | — |
-| Frame animação 1080p | ≤ 16 ms | — | — |
-| Frame ocioso | ≤ 33 ms | — | — |
-| RSS | < 120 MB | — | — |
+| Startup até primeira tela | < 400 ms | ~40 ms no caminho de captura (headless) | 2026-10-25 |
+| Frame animação 1080p | ≤ 16 ms | ~15 ms/quadro (suíte dourada release, indicativo) | 2026-10-25 |
+| Frame ocioso | ≤ 33 ms | sem redesenho ocioso; poll 100 ms; medir em VT | — |
+| RSS | < 120 MB | ~39 MB (captura release) | 2026-10-25 |
 | CPU ocioso | < 2% | — | — |
-| Binário release | < 15 MB | 3,4 MB (Fase 2) | 2026-10-25 |
+| Binário release | < 15 MB | 3,6 MB (Fase 4) | 2026-10-25 |
 | Assets | < 4 MB | 1.387.923 B (1,39 MB) | 2026-10-25 |
-| Latência de tecla | < 50 ms | — | — |
-| Captura | < 1 s | ~40 ms (release, headless) | 2026-10-25 |
-| Suíte dourada (16 quadros) | — | ~0,25 s em release | 2026-10-25 |
+| Handshake de áudio | não bloquear o loop | < 400 ms (teste; sem dispositivo = silêncio) | 2026-10-25 |
 | Latência de tecla | < 50 ms | — (requer VT) | — |
+| Captura | < 1 s | ~40 ms (release, headless) | 2026-10-25 |
+| Suíte dourada (16 quadros) | — | ~0,24 s em release | 2026-10-25 |
 
 Preencher apenas com medições reais em release.
 
@@ -303,3 +337,5 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Commit inicial `ed07e19` com especificação e Fase 1 |
 | 2026-10-25 | Fase 2: fbdev/ABI/formatos, console e sinais, tema, cena/texto, captura PNG, app estático; 163 testes no total |
 | 2026-10-25 | Fase 3: fluxo Input→App→cena, histórico com rolagem/recall, flash/debounce, marcador de som, 16 capturas douradas, PTY e teste de sinal; 182 testes ativos + 2 auxiliares |
+| 2026-10-25 | Fase 4: áudio ALSA dinâmico + síntese, fade de histórico, contraste/paletas, compositor com fundo em cache, capturas regeneradas; 194 testes ativos + 2 auxiliares |
+| 2026-10-25 | Validação inicial em VT reportada OK pelo usuário |

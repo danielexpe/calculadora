@@ -29,6 +29,48 @@ pub fn capture_frame(scene: &Scene, engine: &TextEngine) -> Pixmap {
     canvas
 }
 
+pub struct Compositor {
+    background: Pixmap,
+    scale: f32,
+    dx: f32,
+    dy: f32,
+    quality: FilterQuality,
+}
+
+impl Compositor {
+    pub fn new(background: &Background, width: u32, height: u32, scale: f32) -> Self {
+        let mut pixmap = Pixmap::new(width, height).expect("device size is valid");
+        paint_background(&mut pixmap, background);
+        let (dx, dy) = layout::centered_offset(width, height, scale);
+        let quality = if (scale - 1.0).abs() < 0.001 {
+            FilterQuality::Nearest
+        } else {
+            FilterQuality::Bilinear
+        };
+        Self {
+            background: pixmap,
+            scale,
+            dx,
+            dy,
+            quality,
+        }
+    }
+
+    pub fn compose(&self, scene: &Scene, engine: &TextEngine) -> Pixmap {
+        let mut device = self.background.clone();
+        let items = render_scene(scene, engine);
+        let paint = PixmapPaint {
+            opacity: 1.0,
+            blend_mode: tiny_skia::BlendMode::SourceOver,
+            quality: self.quality,
+        };
+        let transform =
+            Transform::from_scale(self.scale, self.scale).post_translate(self.dx, self.dy);
+        device.draw_pixmap(0, 0, items.as_ref(), &paint, transform, None);
+        device
+    }
+}
+
 pub fn compose_device(
     scene: &Scene,
     engine: &TextEngine,
@@ -36,25 +78,7 @@ pub fn compose_device(
     height: u32,
     scale: f32,
 ) -> Pixmap {
-    let mut device = Pixmap::new(width, height).expect("device size is valid");
-    paint_background(&mut device, &scene.background);
-
-    let items = render_scene(scene, engine);
-    let quality = if (scale - 1.0).abs() < 0.001 {
-        FilterQuality::Nearest
-    } else {
-        FilterQuality::Bilinear
-    };
-    let paint = PixmapPaint {
-        opacity: 1.0,
-        blend_mode: tiny_skia::BlendMode::SourceOver,
-        quality,
-    };
-    let (dx, dy) = layout::centered_offset(width, height, scale);
-    let transform = Transform::from_scale(scale, scale).post_translate(dx, dy);
-
-    device.draw_pixmap(0, 0, items.as_ref(), &paint, transform, None);
-    device
+    Compositor::new(&scene.background, width, height, scale).compose(scene, engine)
 }
 
 fn paint_background(pixmap: &mut Pixmap, background: &Background) {
@@ -235,6 +259,7 @@ mod tests {
             selection: None,
             sound: SoundStatus::On,
             pressed: None,
+            history_fade: None,
         })
     }
 
@@ -264,6 +289,18 @@ mod tests {
         let first = capture_frame(&scene(&theme, &history), &engine);
         let second = capture_frame(&scene(&theme, &history), &engine);
         assert_eq!(first.data(), second.data());
+    }
+
+    #[test]
+    fn cached_compositor_matches_direct_composition() {
+        let engine = TextEngine::new().unwrap();
+        let theme = Theme::truecolor();
+        let history = crate::core::History::new();
+        let scene = scene(&theme, &history);
+        let compositor = Compositor::new(&scene.background, 1920, 1080, 1.0);
+        let cached = compositor.compose(&scene, &engine);
+        let direct = compose_device(&scene, &engine, 1920, 1080, 1.0);
+        assert_eq!(cached.data(), direct.data());
     }
 
     #[test]

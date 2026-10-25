@@ -13,7 +13,7 @@
 | 1 — Fundação | domínio puro, CLI, i18n, entrada | cálculo testado, `--capture-frame` ainda não |
 | 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25); VT pendente |
 | 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída (headless)**; VT pendente |
-| 4 — Acabamento | tema, som, a11y, desempenho | polimento e orçamentos medidos |
+| 4 — Acabamento | tema, som, a11y, desempenho | **concluída (headless)**; VT pendente |
 | 5 — Release v1.0 | validação em VT, pacote, docs | pacote + smoke test |
 | 6 — Backlog | TUI, DRM/KMS, persistência | priorizado pelo usuário |
 
@@ -38,12 +38,12 @@ Critérios de saída:
 - [x] Ambiente auditado e bloqueios registrados.
 - [x] Nenhum código de produção iniciado (conforme pedido).
 
-Pendências herdadas:
+Pendências herdadas (atualizadas em 2026-10-25):
 
-- Adicionar o usuário ao grupo `video` e relogar.
-- Escolher um VT local livre para a validação.
-- Confirmar 24/16 bpp ou marcar como pendente no release.
-- Validar em VT real a partir da Fase 2.
+- [x] Adicionar o usuário ao grupo `video` e relogar.
+- [x] Escolher um VT local livre para a validação.
+- [ ] Confirmar 24/16 bpp ou marcar como pendente no release.
+- [x] Validar a execução inicial em VT real (reportada OK).
 
 ## Fase 1 — Fundação (concluída em 2026-10-25)
 
@@ -106,15 +106,15 @@ Critérios de saída:
 - [x] `--capture-frame` não abre fb, tty interativo nem áudio.
 - [x] Erros de permissão com código 3 e mensagens acionáveis; erros de VT/TTY
   têm mensagens e código 3, testados por unidade.
-- [x] Nenhum `unsafe` fora de `platform/fb.rs`.
-- [ ] Em VT real: imagem válida em 32 bpp **ou** bloqueio registrado com o
-  que foi testado sem hardware. **Pendente:** P-01/P-02 (grupo `video` e VT
-  livre); não declarar validado até executar.
+- [x] Nenhum `unsafe` fora de `platform/fb.rs` na Fase 2 (D-019 estendeu
+  para `platform/audio.rs` na Fase 4).
+- [x] Em VT real: execução inicial em 32 bpp reportada **OK** pelo usuário
+  (2026-10-25, `amdgpudrmfb` 1920 × 1080); detalhes de 24/16 bpp pendentes.
 
 Evidência headless: captura determinística, 154 testes unitários + 8 de
 processo + 1 do xtask; ver `docs/10-validation-log.md`.
 
-## Fase 3 — Fluxo funcional (concluída em 2026-10-25 no headless)
+## Fase 3 — Fluxo funcional (concluída em 2026-10-25; VT testado)
 
 **Escopo:** ligar input → domínio → UI → fb; histórico e interação completos.
 
@@ -133,8 +133,9 @@ Tarefas:
 
 Critérios de saída:
 
-- [ ] Fluxo completo em 32 bpp no VT **ou** bloqueio registrado. **Pendente:**
-  P-01/P-02 (grupo `video` e VT livre); código testado apenas no headless.
+- [x] Fluxo completo em 32 bpp no VT: execução inicial reportada **OK** pelo
+  usuário em 2026-10-25. Detalhes de latência e restauração por caminho ainda
+  não foram registrados.
 - [x] Todas as capturas de `docs/05` aprovadas: 16 PNGs em `tests/snapshots/`.
 - [x] `Ctrl+C` mapeado para `Quit`; raw mode restaurado em PTY; `SIGTERM`
   marca a flag em teste de processo. Restauração visual de `KD_TEXT`/cursor
@@ -148,7 +149,7 @@ Evidência headless: 16 capturas douradas, testes de `App` (flash, debounce,
 seleção/recall), PTY de raw mode e flag de `SIGTERM`; ver
 `docs/10-validation-log.md`.
 
-## Fase 4 — Acabamento
+## Fase 4 — Acabamento (concluída em 2026-10-25; VT inicial testado)
 
 **Escopo:** polimento visual, áudio, acessibilidade e desempenho.
 
@@ -165,13 +166,19 @@ Tarefas:
 
 Critérios de saída:
 
-- [ ] Áudio liga/desliga sem bloquear; sem ALSA = silêncio.
-- [ ] Capturas em truecolor/256/16/mono aprovadas.
-- [ ] Contraste e estados não dependem só de cor.
-- [ ] Startup < 400 ms; frame animação ≤ 16 ms; ocioso ≤ 33 ms.
-- [ ] RSS < 120 MB; binário < 15 MB; assets < 4 MB.
-- [ ] CPU ocioso < 2%; latência de tecla < 50 ms.
-- [ ] Números medidos registrados em `docs/10`.
+- [x] Áudio liga/desliga sem bloquear; sem ALSA/dispositivo = silêncio e
+  status “Som indisponível”. **Ouvir clique/erro em VT real segue pendente.**
+- [x] Capturas em truecolor/256/16/mono aprovadas (16 douradas).
+- [x] Contraste documentado e testado; estados usam forma/borda além de cor.
+- [x] Startup/captura headless ~40 ms; suíte de 16 quadros ~0,24 s em release
+  (~15 ms/quadro, indicativo). **Frame em VT e ocioso ≤ 33 ms pendentes.**
+- [x] RSS ~39 MB na captura; binário 3,6 MB; assets 1,4 MB.
+- [ ] CPU ocioso < 2% e latência de tecla < 50 ms **pendentes** (requerem VT).
+- [x] Números medidos registrados em `docs/10`.
+
+Evidência headless: síntese testada sem hardware, backend ALSA com handshake e
+fallback silencioso, fade de 120 ms, contraste ≥ 4,5:1/10:1 e paletas
+douradas. Ver `docs/10-validation-log.md`.
 
 ## Fase 5 — Release v1.0
 

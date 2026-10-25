@@ -186,7 +186,7 @@ Tabela mínima:
 - [x] `NO_COLOR` força mono.
 - [x] `--color never` força mono.
 - [x] `--color auto` escolhe truecolor em 32 bpp e 256 em 16 bpp.
-- [ ] Contraste mínimo verificado nos tokens principais.
+- [x] Contraste mínimo verificado nos tokens principais.
 - [x] Estado de tecla pressionada tem relevo/borda além de cor.
 - [x] Seleção de histórico tem barra além de fundo.
 
@@ -245,6 +245,10 @@ Atualização: `UPDATE_SNAPSHOTS=1 cargo test --test golden`.
 - [x] `Ctrl+C` em raw mode vira `Quit`, não sinal.
 - [x] Mudança de idioma/som não corrompe o estado do cálculo.
 - [x] Sem fb: mensagem de permissão e de VT são distintas (testes de unidade).
+- [x] Áudio: síntese finita, determinística, pico ≤ 1,0 e durações fixas.
+- [x] Áudio: backend indisponível é silencioso e `try_send` não bloqueia.
+- [x] `--no-animations` desliga o fade e reduz o flash a 60 ms.
+- [x] `NO_COLOR` tem prioridade e produz a mesma captura de `--color never`.
 
 ## 8. Falhas e códigos de saída
 
@@ -313,9 +317,9 @@ cargo test -- --nocapture
 ## 11. Cobertura e meta
 
 - Meta: **≥ 150 casos de teste** no total (tabelas contam casos).
-- Fase 1: 112 casos; Fase 2: 163; Fase 3: **182 testes ativos** (170
-  unitários, 8 de processo/CLI, 1 golden, 1 PTY, 1 sinais, 1 xtask), mais 2
-  auxiliares `#[ignore]` executados pelos testes de PTY/sinais.
+- Fase 1: 112 casos; Fase 2: 163; Fase 3: 182; Fase 4: **194 testes ativos**
+  (181 unitários, 9 de processo/CLI, 1 golden, 1 PTY, 1 sinais, 1 xtask),
+  mais 2 auxiliares `#[ignore]` executados pelos testes de PTY/sinais.
 - Domínio puro deve ter a maior densidade; renderização cobre formatos e
   estados; 16 capturas douradas cobrem os estados visuais.
 - Nenhuma linha de `unsafe` sem teste de ABI/limites correspondente.
@@ -344,7 +348,9 @@ cargo test -- --nocapture
 | Capturas douradas de estados | **concluído** na Fase 3 (16 PNGs) |
 | Integração/PTY e sinais | **concluído** no headless na Fase 3 |
 | Fluxo completo de cálculo | **concluído** na Fase 3 (headless/App) |
-| Validação em hardware | **pendente** (grupo `video` e VT) |
+| Áudio sintetizado + backend ALSA | **concluído** no headless na Fase 4 |
+| Fade, contraste e paletas finais | **concluído** na Fase 4 |
+| Validação em hardware/áudio real | **pendente** (grupo `video` e VT) |
 
 Portões executados em 2026-10-25:
 
@@ -353,8 +359,8 @@ Portões executados em 2026-10-25:
 | `cargo fmt --all -- --check` | verde |
 | `cargo clippy --workspace --all-targets -- -D warnings` | verde |
 | `cargo clippy --workspace --all-targets --no-default-features -- -D warnings` | verde |
-| `cargo test --workspace` | 182 ativos verdes (Fase 3) |
-| `cargo test --workspace --no-default-features` | 182 ativos verdes (Fase 3) |
+| `cargo test --workspace` | 194 ativos verdes (Fase 4) |
+| `cargo test --workspace --no-default-features` | 194 ativos verdes (Fase 4) |
 | `cargo xtask assets --check` | verde |
 | `cargo build --release` | verde |
 | `cargo build --release --no-default-features` | verde |

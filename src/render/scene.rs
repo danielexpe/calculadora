@@ -143,6 +143,7 @@ pub struct CalculatorView<'a> {
     pub selection: Option<usize>,
     pub sound: SoundStatus,
     pub pressed: Option<KeyId>,
+    pub history_fade: Option<f32>,
 }
 
 pub fn calculator_scene(view: &CalculatorView<'_>) -> Scene {
@@ -306,6 +307,10 @@ pub fn calculator_scene(view: &CalculatorView<'_>) -> Scene {
     scene
 }
 
+fn fade_color(color: Rgba8, alpha: u8) -> Rgba8 {
+    color.with_alpha((color.a as u16 * alpha as u16 / 255) as u8)
+}
+
 fn sound_marker(scene: &mut Scene, theme: &Theme, status: SoundStatus) {
     let x = layout::SOUND_MARKER_X;
     let y = layout::SOUND_MARKER_Y;
@@ -378,9 +383,26 @@ fn history(scene: &mut Scene, view: &CalculatorView<'_>) {
 
     for index in start..end {
         let row = index - start;
-        let y = area_y + row as f32 * layout::HISTORY_ROW_H;
+        let base_y = area_y + row as f32 * layout::HISTORY_ROW_H;
         let entry = view.history.get(index).expect("history index in range");
         let selected = selection == Some(index);
+        let fade = if index + 1 == len {
+            view.history_fade
+        } else {
+            None
+        };
+        let (y, alpha) = match fade {
+            Some(progress) => {
+                let progress = progress.clamp(0.0, 1.0);
+                (
+                    base_y + 8.0 * (1.0 - progress),
+                    (progress * 255.0).round() as u8,
+                )
+            }
+            None => (base_y, 255),
+        };
+        let expression_color = fade_color(theme.text_secondary, alpha);
+        let result_color = fade_color(theme.text_primary, alpha);
 
         if selected {
             scene.rect(Rect {
@@ -413,7 +435,7 @@ fn history(scene: &mut Scene, view: &CalculatorView<'_>) {
             text: entry.expression(view.lang.number_locale()),
             font: FontKind::MonoRegular,
             size: 18.0,
-            color: theme.text_secondary,
+            color: expression_color,
             align: Align::Right,
         });
         scene.text(Text {
@@ -424,7 +446,7 @@ fn history(scene: &mut Scene, view: &CalculatorView<'_>) {
             text: crate::core::format_value(entry.result, view.lang.number_locale()),
             font: FontKind::MonoRegular,
             size: 22.0,
-            color: theme.text_primary,
+            color: result_color,
             align: Align::Right,
         });
     }
@@ -573,6 +595,7 @@ mod tests {
             selection: None,
             sound: SoundStatus::On,
             pressed: None,
+            history_fade: None,
         }
     }
 

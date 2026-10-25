@@ -1,5 +1,6 @@
 pub mod app;
 pub mod assets;
+pub mod audio;
 pub mod capture;
 pub mod cli;
 pub mod core;
