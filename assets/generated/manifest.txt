@@ -1,0 +1,8 @@
+# calculadora assets manifest v1
+# fnv1a64  size  path
+c97b49922f93865a  411640  fonts/Inter-Regular.ttf
+4ba321d959bfb994  419744  fonts/Inter-SemiBold.ttf
+7999ed65a358cefd  273860  fonts/JetBrainsMono-Medium.ttf
+4a1b35e9fc6920d2  273900  fonts/JetBrainsMono-Regular.ttf
+843005b95ddabac7  4380  fonts/OFL-Inter.txt
+4c1f819960178e41  4399  fonts/OFL-JetBrainsMono.txt

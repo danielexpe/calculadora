@@ -1,0 +1,24 @@
+[package]
+name = "calculadora"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+description = "Calculadora decimal para console Linux via framebuffer"
+license = "MIT"
+publish = false
+
+[workspace]
+members = ["xtask"]
+resolver = "2"
+
+[features]
+default = ["audio"]
+audio = ["dep:libloading"]
+
+[dependencies]
+clap = { version = "4.6", features = ["derive"] }
+crossterm = "0.29"
+fontdue = "0.9"
+libloading = { version = "0.8", optional = true }
+rust_decimal = { version = "1.43", default-features = false, features = ["std"] }
+thiserror = "2"
