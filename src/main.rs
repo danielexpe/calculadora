@@ -1,6 +1,6 @@
 use std::process::ExitCode;
 
-use calculadora::cli::Cli;
+use calculadora::{app, capture, cli::Cli};
 use clap::Parser;
 
 fn main() -> ExitCode {
@@ -8,15 +8,26 @@ fn main() -> ExitCode {
 }
 
 fn run(cli: Cli) -> ExitCode {
-    if let Some(path) = &cli.capture_frame {
-        eprintln!(
-            "error: frame capture is not implemented until phase 2 (requested {})",
-            path.display()
-        );
-        return ExitCode::from(1);
+    if cli.is_capture() {
+        return match capture::write_frame(&cli) {
+            Ok(info) => {
+                if let Some(path) = &cli.capture_frame {
+                    println!("wrote {} ({}x{})", path.display(), info.width, info.height);
+                }
+                ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("error: {error}");
+                ExitCode::from(1)
+            }
+        };
     }
 
-    eprintln!("error: framebuffer runtime is not implemented until phase 2");
-    eprintln!("help: phase 1 provides the domain, CLI, i18n and tests only");
-    ExitCode::from(3)
+    match app::run_fb(&cli) {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            eprintln!("error: {error}");
+            ExitCode::from(error.exit_code())
+        }
+    }
 }

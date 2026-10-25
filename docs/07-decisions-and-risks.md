@@ -182,6 +182,21 @@
   precisam cobrir o caso de 17 caracteres. `MAX_DISPLAY_CHARS` continua 16 para
   valores formatados.
 
+### D-018 — Substrato fb da Fase 2
+
+- **Status:** aceita e implementada na Fase 2.
+- **Contexto:** a captura PNG e o backend fb exigem rasterização, blend,
+  texto e acesso a ioctl/mmap sem GPU. As crates `tiny-skia`, `image`,
+  `libc` e `bytemuck` já estavam em cache e foram aprovadas pelo usuário.
+- **Decisão:** `tiny-skia` rasteriza a cena lógica e compõe com
+  `draw_pixmap` (1:1 em 1080p, bilinear nas demais escalas); `image` com
+  feature `png` encoda a captura; `libc` isola ioctl/mmap/sinais em
+  `platform/fb.rs`; `bytemuck` fornece `Pod`/`Zeroable` para a ABI de 160
+  bytes. Não foi adicionado pipeline de arte nem `memmap2`.
+- **Consequências:** `unsafe` continua restrito a `platform/fb.rs`; a captura
+  não abre fb/tty/áudio; 24/16 bpp têm conversão por bitfield testada; a
+  validação em VT real segue bloqueada por P-01/P-02.
+
 ## 2. Premissas
 
 - O usuário pode entrar no grupo `video` e fazer novo login.
@@ -212,7 +227,7 @@
 | R-012 | Troca de VT deixa resíduos | baixa | console sujo | documentar; restaurar em Drop/sinais | aberto |
 | R-013 | Escopo crescer (científica, mouse, persistência) | baixa | atraso | não-objetivos congelados; backlog | aceito |
 | R-014 | Licença de dependência divergir da expectativa | baixa | bloqueio de release | `cargo metadata` antes do release | aberto |
-| R-015 | `unsafe` de ioctl/mmap com ABI errada | baixa | crash/corrupção | const asserts 160/80; validação; testes | aberto |
+| R-015 | `unsafe` de ioctl/mmap com ABI errada | baixa | crash/corrupção | const asserts 160/80; validação; testes implementados; falta VT real | aberto |
 | R-016 | Fonte grande demais para o orçamento | baixa | binário > 15 MB | assets medidos em 1,39 MB; subset no backlog | resolvido |
 
 ## 4. Questões abertas

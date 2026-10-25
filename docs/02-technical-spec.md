@@ -74,8 +74,9 @@ src/
     mod.rs
     layout.rs        # canvas, geometria, breakpoints internos, escala
     scene.rs         # primitivas lógicas (retângulo, texto, linha)
-    text.rs          # fontdue, cache de glifos, medição, wrap
-    fb.rs            # rasterização, blend, escala, composição
+    text.rs          # fontdue, cache de glifos, medição, ellipsis
+    blend.rs         # blend RGBA pré-multiplicado com cobertura
+    fb.rs            # rasterização, escala, composição e captura
   platform/
     mod.rs
     fb.rs            # device, console, ioctls, mmap, sinais, guardas
@@ -123,11 +124,13 @@ xtask = "run --package xtask --"
 | `util/tty.rs` | implementado |
 | `assets.rs` (4 TTF, cobertura de glifos) | implementado |
 | `xtask` (manifesto FNV-1a) | implementado |
-| `main.rs` | placeholder: CLI funciona; runtime sai com código 3 |
-| `render/`, `platform/fb.rs` | Fase 2 |
-| `capture.rs` | Fase 2 |
+| `theme.rs` (truecolor/256/16/mono) | implementado na Fase 2 |
+| `render/` (scene, layout, text, blend, fb) | implementado na Fase 2 |
+| `platform/fb.rs` (ABI, mmap, console, sinais) | implementado na Fase 2 |
+| `capture.rs` (PNG 1344 × 756 determinístico) | implementado na Fase 2 |
+| `app.rs` (loop fb, idioma, som, saída) | parcial: cena estática; fluxo de cálculo na Fase 3 |
+| `main.rs` | capture e runtime fb ligados; códigos 0/1/3 |
 | `audio.rs` | Fase 4 |
-| `theme.rs` | Fase 2 |
 
 ## 4. Dependências
 
@@ -142,15 +145,17 @@ xtask = "run --package xtask --"
 | Raster | `tiny-skia` | 0.12.0 | sim | 2 |
 | PNG | `image` | 0.25.10 | sim | 2 |
 | Sistema | `libc` | 0.2.191 | sim | 2 (direto); transitivo na 1 |
+| Sistema | `bytemuck` | 1.25.2 | sim | 2 (derive Pod/Zeroable na ABI) |
 | xtask | apenas `std` | — | — | 1 |
 
 Política:
 
 - O `Cargo.toml` da Fase 1 inclui `clap`, `crossterm`, `fontdue`,
-  `rust_decimal`, `thiserror` e `libloading` opcional. `tiny-skia`, `image` e
-  `libc` entram na Fase 2.
+  `rust_decimal`, `thiserror` e `libloading` opcional. Na Fase 2 entraram
+  `tiny-skia`, `image`, `libc` e `bytemuck`, com aprovação explícita.
 - `clap`: feature `derive`.
 - `image`: `default-features = false`, feature `png` apenas.
+- `bytemuck`: `derive` para `Pod`/`Zeroable` nas structs de ABI do fbdev.
 - `libloading`: opcional, atrás da feature `audio`.
 - **Proibido** adicionar `ratatui`, `ratatui-image`, `memmap2`, `rand`, `chrono`
   ou `anyhow` sem novo ADR e aprovação.
@@ -341,11 +346,11 @@ Item =
 ### 8.4 Composição
 
 - `tiny-skia` trabalha com RGBA **pré-multiplicado**; respeitar no blend.
-- Fundo (gradiente) pré-renderizado no tamanho do dispositivo, uma vez.
-- Card e fita podem ser cacheados como imagem estática; apenas textos, teclas
-  pressionadas e mensagens são redesenhados.
-- Ordem: fundo do dispositivo → canvas escalado → composição final.
-- Captura: renderizar a cena em 1344 × 756, compor em RGBA8 e encodar PNG.
+- Fundo (gradiente) é pintado no tamanho do alvo: canvas na captura e
+  dispositivo no fb.
+- A cena lógica é rasterizada uma vez em 1344 × 756 e composta com
+  `draw_pixmap`: caminho 1:1 em 1080p, bilinear nas demais resoluções.
+- Captura: canvas 1344 × 756 com fundo, cena e PNG RGBA8.
 - Encoder PNG com parâmetros fixos; sem metadados variáveis.
 
 ### 8.5 Tema

@@ -16,9 +16,13 @@ default = ["audio"]
 audio = ["dep:libloading"]
 
 [dependencies]
+bytemuck = { version = "1.25", features = ["derive"] }
 clap = { version = "4.6", features = ["derive"] }
 crossterm = "0.29"
 fontdue = "0.9"
+image = { version = "0.25", default-features = false, features = ["png"] }
+libc = "0.2"
 libloading = { version = "0.8", optional = true }
 rust_decimal = { version = "1.43", default-features = false, features = ["std"] }
 thiserror = "2"
+tiny-skia = "0.12"

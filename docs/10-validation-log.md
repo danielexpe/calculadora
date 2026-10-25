@@ -90,7 +90,23 @@ zerocopy 0.8.63
 A licença MIT de `rust_decimal` 1.43.0 e as licenças das crates ativas foram
 registradas em `THIRD_PARTY_NOTICES.md`.
 
-### 2.1 Assets baixados
+### 2.1 Dependências da Fase 2
+
+Adicionadas com aprovação explícita do usuário e já presentes no cache:
+
+```text
+tiny-skia 0.12.0      (BSD-3-Clause)
+tiny-skia-path 0.12.0 (BSD-3-Clause)
+image 0.25.10         (MIT OR Apache-2.0; feature png)
+libc 0.2.191          (MIT OR Apache-2.0)
+bytemuck 1.25.2       (Zlib OR Apache-2.0 OR MIT)
+```
+
+Transitivas de PNG/raster (`png`, `flate2`, `miniz_oxide`, `fdeflate`,
+`crc32fast`, `moxcms`, `pxfm`, `adler2`, `simd-adler32`, `byteorder-lite`,
+`arrayref`, `strict-num`) entraram em `THIRD_PARTY_NOTICES.md`.
+
+### 2.2 Assets baixados
 
 | Asset | Versão | SHA-256 (prefixo) |
 | --- | --- | --- |
@@ -123,11 +139,42 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | `cargo build --release` | verde | binário placeholder |
 | 2026-10-25 | `cargo build --release --no-default-features` | verde | binário placeholder |
 | 2026-10-25 | Binário copiado para `/tmp` sem assets | verde | `--version`/`--help`; runtime sai com 3 |
-| — | Captura PNG | **não implementada** | Fase 2 |
-| — | Execução em `/dev/fb0` | **PENDENTE** | Fase 2 + VT + grupo `video` |
+| 2026-10-25 | `cargo fmt`/`clippy`/`test` com/sem features (Fase 2) | verde | 154 unit + 8 processo + 1 xtask |
+| 2026-10-25 | `--capture-frame` release | verde | PNG 1344 × 756; ~40 ms; hash estável |
+| 2026-10-25 | Build release com/sem features | verde | binário 3,4 MB |
+| 2026-10-25 | Abertura `/dev/fb0` sem permissão | verde (erro esperado) | código 3; instrução do grupo `video` |
+| — | Execução em `/dev/fb0` em VT | **PENDENTE** | P-01/P-02: grupo `video` e VT livre |
 | — | 24 bpp / 16 bpp | **PENDENTE** | hardware/VM não confirmados |
 | — | Áudio real | **PENDENTE** | Fase 4 |
-| — | Restauração de console | **PENDENTE** | Fase 2 |
+| — | Restauração de console | **PENDENTE** | implementada com RAII/sinais/panic; falta VT real |
+
+## 3.1 Evidência da Fase 2 (headless)
+
+Comando:
+
+```bash
+./target/release/calculadora --capture-frame /tmp/calculadora.png
+```
+
+Resultado:
+
+```text
+wrote /tmp/calculadora.png (1344x756)
+elapsed=0.04 s
+PNG 1344 x 756, 8-bit/color RGBA
+sha256 67611a5c...74bb1f (idêntico em duas execuções)
+```
+
+- A cena inicial foi revisada visualmente: fundo em gradiente, fita vazia,
+  visor `0`, keypad 4 × 5, rodapé com idioma e som.
+- O codepath de captura não chama `Framebuffer`, `ConsoleGuard`, raw mode nem
+  áudio; o teste de processo usa `--fb-device` inexistente para provar que a
+  captura o ignora.
+- Testes cobrem ABI 160/80, formatos 32/24/16, rejeição de formato inválido,
+  padding de `line_length`, geometria 1080p/1440p/768p/1024×768, blend
+  pré-multiplicado, cobertura de glifos, determinismo e PNG válido.
+- Execução sem permissão no fb retorna código 3 com instrução acionável.
+- **Não validado em VT real**; P-01/P-02 continuam abertos.
 
 ## 4. Bloqueios ativos
 
@@ -214,10 +261,10 @@ Seguir `docs/05-test-plan.md`, seção 9. Registrar cada item como
 | Frame ocioso | ≤ 33 ms | — | — |
 | RSS | < 120 MB | — | — |
 | CPU ocioso | < 2% | — | — |
-| Binário release | < 15 MB | 1,08 MB (placeholder, sem runtime) | 2026-10-25 |
+| Binário release | < 15 MB | 3,4 MB (Fase 2) | 2026-10-25 |
 | Assets | < 4 MB | 1.387.923 B (1,39 MB) | 2026-10-25 |
 | Latência de tecla | < 50 ms | — | — |
-| Captura | < 1 s | — | — |
+| Captura | < 1 s | ~40 ms (release, headless) | 2026-10-25 |
 
 Preencher apenas com medições reais em release.
 
@@ -229,3 +276,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado |
 | 2026-10-25 | Fase 1: domínio, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados |
 | 2026-10-25 | Commit inicial `ed07e19` com especificação e Fase 1 |
+| 2026-10-25 | Fase 2: fbdev/ABI/formatos, console e sinais, tema, cena/texto, captura PNG, app estático; 163 testes no total |

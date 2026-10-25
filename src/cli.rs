@@ -76,6 +76,14 @@ impl Cli {
     pub fn effective_color(&self, no_color_env: bool) -> ColorMode {
         self.color.effective(no_color_env)
     }
+
+    pub fn effective_color_from_env(&self) -> ColorMode {
+        self.effective_color(no_color_environment())
+    }
+}
+
+pub fn no_color_environment() -> bool {
+    std::env::var_os("NO_COLOR").is_some_and(|value| !value.is_empty())
 }
 
 fn parse_lang(value: &str) -> Result<Lang, String> {

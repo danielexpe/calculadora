@@ -11,7 +11,7 @@
 | --- | --- | --- |
 | 0 — Descoberta | congelar escopo, regras e riscos | docs 01–08 + AGENTS.md |
 | 1 — Fundação | domínio puro, CLI, i18n, entrada | cálculo testado, `--capture-frame` ainda não |
-| 2 — Substrato fb | fbdev, console, texto, cena, captura | PNG 1344 × 756 determinístico |
+| 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25); VT pendente |
 | 3 — Fluxo funcional | UI completa, input loop, histórico | fluxo completo + capturas douradas |
 | 4 — Acabamento | tema, som, a11y, desempenho | polimento e orçamentos medidos |
 | 5 — Release v1.0 | validação em VT, pacote, docs | pacote + smoke test |
@@ -80,7 +80,7 @@ Critérios de saída:
 - [x] `THIRD_PARTY_NOTICES.md` confere com `cargo tree`/`cargo metadata`.
 - [x] Nenhum import de UI/`libc`/fb em `core/`.
 
-## Fase 2 — Substrato framebuffer
+## Fase 2 — Substrato framebuffer (concluída em 2026-10-25)
 
 **Escopo:** abrir `/dev/fb0`, validar formato, mapear memória, renderizar cena
 estática, texto e captura PNG. Ainda sem fluxo completo de cálculo na tela.
@@ -98,16 +98,21 @@ Tarefas:
 
 Critérios de saída:
 
-- [ ] Captura 1344 × 756 determinística e < 1 s.
-- [ ] Testes de 32/24/16 bpp e rejeição de formato desconhecido.
-- [ ] Blend pré-multiplicado correto (0, opaco, parcial).
-- [ ] Geometria correta em 1080p/1440p/768p/1024×768.
-- [ ] Todos os glifos do catálogo cobertos.
-- [ ] `--capture-frame` não abre fb, tty interativo nem áudio.
-- [ ] Erros de permissão/VT/TTY com código 3 e mensagens acionáveis.
-- [ ] Nenhum `unsafe` fora de `platform/fb.rs`.
+- [x] Captura 1344 × 756 determinística e < 1 s (medida: ~40 ms).
+- [x] Testes de 32/24/16 bpp e rejeição de formato desconhecido.
+- [x] Blend pré-multiplicado correto (0, opaco, parcial).
+- [x] Geometria correta em 1080p/1440p/768p/1024×768.
+- [x] Todos os glifos do catálogo cobertos.
+- [x] `--capture-frame` não abre fb, tty interativo nem áudio.
+- [x] Erros de permissão com código 3 e mensagens acionáveis; erros de VT/TTY
+  têm mensagens e código 3, testados por unidade.
+- [x] Nenhum `unsafe` fora de `platform/fb.rs`.
 - [ ] Em VT real: imagem válida em 32 bpp **ou** bloqueio registrado com o
-  que foi testado sem hardware.
+  que foi testado sem hardware. **Pendente:** P-01/P-02 (grupo `video` e VT
+  livre); não declarar validado até executar.
+
+Evidência headless: captura determinística, 154 testes unitários + 8 de
+processo + 1 do xtask; ver `docs/10-validation-log.md`.
 
 ## Fase 3 — Fluxo funcional
 

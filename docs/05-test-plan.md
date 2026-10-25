@@ -224,12 +224,12 @@ Cada captura: 1344 × 756, RGBA8, sem metadados variáveis.
 
 ### 6.3 Determinismo da captura CLI
 
-- [ ] `--capture-frame` gera 1344 × 756.
-- [ ] Duas execuções produzem bytes idênticos.
-- [ ] Captura não abre `/dev/fb0`, não entra em raw mode e não toca áudio.
-- [ ] Captura com `--lang en`, `--color never`, `--no-audio` reflete as flags.
-- [ ] Caminho inválido/sem permissão retorna código 1 e mensagem acionável.
-- [ ] Captura termina em < 1 s.
+- [x] `--capture-frame` gera 1344 × 756.
+- [x] Duas execuções produzem bytes idênticos.
+- [x] Captura não abre `/dev/fb0`, não entra em raw mode e não toca áudio.
+- [x] Captura com `--lang en`, `--color never`, `--no-audio` reflete as flags.
+- [x] Caminho inválido/sem permissão retorna código 1 e mensagem acionável.
+- [x] Captura termina em < 1 s (~40 ms em release).
 
 ## 7. Integração e PTY
 
@@ -328,12 +328,13 @@ cargo test -- --nocapture
 | Área | Status |
 | --- | --- |
 | Documentos e decisões | concluído |
-| Testes de domínio | **concluído** na Fase 1 (103 unitários) |
+| Testes de domínio | **concluído** na Fase 1 |
 | Testes de entrada/i18n/CLI/state/assets | **concluído** na Fase 1 |
-| Testes de processo/CLI | **concluído** na Fase 1 (5) |
-| Manifesto/xtask | **concluído** na Fase 1 (1) |
-| Testes de framebuffer | pendente (Fase 2) |
-| Capturas douradas | pendente (Fase 2/3) |
+| Testes de processo/CLI | **concluído** (8) |
+| Manifesto/xtask | **concluído** (1) |
+| Testes de framebuffer, layout, texto e blend | **concluído** na Fase 2 |
+| Captura determinística headless | **concluído** na Fase 2 |
+| Capturas douradas de estados | pendente (Fase 3) |
 | Integração/PTY | pendente (Fase 3) |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
 

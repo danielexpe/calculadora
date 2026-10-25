@@ -12,7 +12,8 @@
    branch `main`, com commit inicial `ed07e19`. Não criar novo commit, push,
    tag ou release sem pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
-5. Não iniciar fase sem pedido explícito; as Fases 0 e 1 estão concluídas.
+5. Não iniciar fase sem pedido explícito; as Fases 0, 1 e 2 estão concluídas
+   (a Fase 2 só no caminho headless; VT pendente).
 
 ## 2. Status atual
 
@@ -21,16 +22,17 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fase 1 implementada; runtime fb não iniciado |
+| Código de produção | Fases 1–2 implementadas; runtime fb estático; fluxo de cálculo na Fase 3 |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
-| Testes | 112 verdes (106 unitários + 5 processo + 1 xtask) |
-| Fase 2 — Substrato fb | pendente |
-| Fase 3 — Fluxo funcional | pendente |
+| Fase 2 — Substrato fb | **concluída no headless** (2026-10-25); VT/fb real pendente |
+| Testes | 163 verdes (154 unitários + 8 processo + 1 xtask) |
+| Captura PNG | **implementada**: 1344 × 756 determinística, ~40 ms |
+| Fase 3 — Fluxo funcional | pendente (não iniciar sem pedido) |
 | Fase 4 — Acabamento | pendente |
 | Fase 5 — Release | pendente |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
-| Repositório git | inicializado em `main`; commit inicial `ed07e19` |
-| Commits/releases | 1 commit local (`ed07e19`); nenhum push/release |
+| Repositório git | inicializado em `main`; commits `ed07e19` e `7923129` |
+| Commits/releases | 2 commits locais (`ed07e19`, `7923129`); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -100,12 +102,13 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 | P-08 | Decidir se TUI volta no backlog | Fase 6 | usuário |
 
 P-03/P-04/P-05 foram concluídas na Fase 1 (`rust_decimal` 1.43.0, quatro TTF
-OFL e licenças confirmadas). Bloqueios de hardware não podem ser declarados
-validados.
+OFL e licenças confirmadas). Na Fase 2, `tiny-skia` 0.12.0, `image` 0.25.10
+(feature `png`), `libc` 0.2.191 e `bytemuck` 1.25.2 foram aprovados e
+adicionados. Bloqueios de hardware não podem ser declarados validados.
 
 ## 7. Comandos e portões
 
-Portões atuais (Fase 1 verde):
+Portões atuais (Fase 2 verde):
 
 ```bash
 cargo fmt --all -- --check
@@ -118,13 +121,14 @@ cargo build --release
 cargo build --release --no-default-features
 ```
 
-QA sem hardware (planejado para a Fase 2; ainda não implementado):
+QA sem hardware (implementado na Fase 2):
 
 ```bash
 ./target/release/calculadora --capture-frame /tmp/calculadora.png
+# esperado: PNG 1344x756 determinístico, ~40 ms, sem abrir fb/tty/áudio
 ```
 
-Validação em VT (após P-01/P-02 e implementação da Fase 2):
+Validação em VT (ainda bloqueada por P-01/P-02):
 
 ```bash
 ls -l /dev/fb0
@@ -141,15 +145,19 @@ Ambiente auditado em 2026-10-25:
 - Sessão atual em Wayland no tty2; `/dev/tty` não é TTY no shell atual.
 - `rust_decimal` 1.43.0 baixada e pinada no `Cargo.lock`.
 - Fontes Inter 4.1 e JetBrains Mono 2.304 baixadas, com hashes registrados.
-- Binário atual é placeholder da Fase 1; fb/captura/áudio pendentes.
+- Fase 2 implementada: fbdev, console/sinais, tema, cena/texto, captura PNG e
+  app estático. Binário release ~3,4 MB.
+- Áudio ainda não implementado; fluxo completo de cálculo fica na Fase 3.
+- Captura PNG validada; execução em VT real **não** validada.
 
 ## 8. Regras de trabalho do agente
 
 - Ler `AGENTS.md`, docs e `git status` antes de agir.
 - Não reimplementar fases concluídas; não iniciar fase sem pedido.
 - Não reabrir decisão congelada; propor ADR.
-- Não adicionar dependência/rede sem aprovação explícita; `rust_decimal` e as
-  fontes já foram aprovadas/baixadas.
+- Não adicionar dependência/rede sem aprovação explícita. Aprovadas:
+  `rust_decimal`, as fontes, e na Fase 2 `tiny-skia`, `image`, `libc` e
+  `bytemuck`.
 - Não fazer commit, push, amend, PR ou configurar remote sem pedido.
 - Não criar commit, push, tag ou release sem pedido; o repositório local já
   existe.
@@ -188,6 +196,8 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 0: criados README, docs 01–10 e AGENTS.md; decisões e riscos congelados; nenhum código | `README.md`, `docs/*`, `AGENTS.md` | `ed07e19` |
 | 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado | `.gitignore`, `AGENTS.md`, `docs/10-validation-log.md` | `ed07e19` |
 | 2026-10-25 | Fase 1: domínio decimal/calculator/history, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados | `Cargo.toml`, `Cargo.lock`, `src/**`, `tests/**`, `xtask/**`, `assets/**`, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `ed07e19` |
+| 2026-10-25 | Fase 2: `platform/fb` (ABI 160/80, 32/24/16 bpp, mmap, console KD, sinais, panic), tema 4 paletas, cena/layout/texto/blend, captura PNG e app estático; 163 testes; captura 40 ms | `Cargo.toml`, `Cargo.lock`, `src/app.rs`, `src/capture.rs`, `src/platform/**`, `src/render/**`, `src/theme.rs`, `src/lib.rs`, `src/main.rs`, `src/cli.rs`, `tests/cli_process.rs`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | README reescrito para uso/teste da versão inicial 0.1.0: captura headless, determinismo, portões, execução em VT, códigos de saída e limitações | `README.md`, `AGENTS.md` | pendente (sem commit) |
 
 ## 11. Fases
 
@@ -195,7 +205,7 @@ Não registrar segredos. Não inventar progresso.
 | --- | --- | --- |
 | 0 | especificação e planejamento | concluída |
 | 1 | fundação pura, CLI, i18n, input, testes | **concluída** |
-| 2 | fbdev, console, texto, cena, captura | pendente |
+| 2 | fbdev, console, texto, cena, captura | **concluída (headless)**; VT pendente |
 | 3 | fluxo completo, histórico, capturas douradas | pendente |
 | 4 | tema, som, a11y, desempenho | pendente |
 | 5 | validação em VT, pacote, docs | pendente |
@@ -203,12 +213,16 @@ Não registrar segredos. Não inventar progresso.
 
 ## 12. Notas para a próxima sessão
 
-- A Fase 1 está concluída. Aguardar pedido explícito para iniciar a Fase 2
-  (fbdev, console, texto, cena e captura PNG).
+- As Fases 1 e 2 estão concluídas no que é testável sem hardware. Aguardar
+  pedido explícito para iniciar a Fase 3 (ligar input → cálculo → cena,
+  histórico, `F2`/`M`, debounce e capturas douradas).
 - Antes de validar em fb: confirmar P-01/P-02 com o usuário.
-- Começar a Fase 2 por `platform/fb.rs` sem alterar as regras de `core/`;
-  validar ABI/formatação com testes sem hardware e usar `--capture-frame` como
-  caminho headless.
+- O `app.rs` atual desenha a cena estática e trata `Q`/`Esc`/`Ctrl+C`, `F2` e
+  `M`; ações de cálculo são ignoradas até a Fase 3.
+- Criar as capturas douradas em `tests/snapshots/` na Fase 3, reutilizando
+  `capture::render_capture` e comparação de RGBA.
+- Em VT, validar 32 bpp primeiro; registrar 24/16 bpp como pendentes se não
+  houver hardware. Nada de declarar validação sem executar.
 - Qualquer mudança de comportamento deve atualizar `docs/01`, `docs/05` e as
   capturas correspondentes.
 - Não publicar release, criar commit/push ou tag sem pedido.

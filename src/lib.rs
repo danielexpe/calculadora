@@ -1,7 +1,12 @@
+pub mod app;
 pub mod assets;
+pub mod capture;
 pub mod cli;
 pub mod core;
 pub mod i18n;
 pub mod input;
+pub mod platform;
+pub mod render;
 pub mod state;
+pub mod theme;
 pub mod util;
