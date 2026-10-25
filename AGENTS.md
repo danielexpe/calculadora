@@ -222,7 +222,8 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Repositório público criado, `main` enviado e teste final registrado | `.git/config`, `AGENTS.md`, `docs/**` | `76fd036` |
 | 2026-10-25 | Tag `v1.0.0` e GitHub release público com `tar.gz` + `.sha256`; assets verificados por download | `README.md`, `AGENTS.md`, `docs/**` | `ea20484` |
 | 2026-10-25 | Housekeeping: Fase 6/backlog removidos (D-020), status final e pendências opcionais | `AGENTS.md`, `docs/01-calculadora.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` | `6cdc306` |
-| 2026-10-25 | README reescrito para usuários e desenvolvedores; pacote regenerado (hash `62829f59…`) e release a atualizar | `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | pendente (sem commit) |
+| 2026-10-25 | README reescrito para usuários e desenvolvedores; pacote regenerado (hash `62829f59…`) | `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | `6d32d1c` |
+| 2026-10-25 | Assets da release `v1.0.0` substituídos pelo pacote/README atualizados; download e sha256 verificados | `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, `...sha256`, `AGENTS.md` | n/a (registro) |
 
 ## 11. Fases
 
