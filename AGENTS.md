@@ -32,7 +32,7 @@
 | Fase 5 — Release | **concluída (pacote local)**; detalhes VT/24-16/público pendentes |
 | Versão | **1.0.0** |
 | Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
-| SHA-256 do pacote | `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023` |
+| SHA-256 do pacote | `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84` |
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
 | Repositório git | inicializado em `main`; último commit de feature `73eac45` |
 | Commits/releases | 8 commits locais (5 de feature + 3 de registro); nenhum push/release |

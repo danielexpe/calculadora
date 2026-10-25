@@ -2,18 +2,21 @@
 
 > Cálculo essencial, com elegância.
 
+Repositório: https://github.com/danielexpe/calculadora
+
 Calculadora decimal para **console Linux local**, renderizada diretamente no
 framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
 servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e
 suporte a português e inglês.
 
-**Versão 1.0.0 — Fases 1 a 4 concluídas em 2026-10-25.** O fluxo
+**Versão 1.0.0 — Fases 1 a 5 concluídas em 2026-10-25.** O fluxo
 completo funciona: digitação, quatro operações, porcentagem, sinal, AC/DEL,
 erros, fita com rolagem/recall, `F2`, `M`, flash, debounce, fade da fita, áudio
 sintetizado com fallback silencioso, paletas e captura PNG com 16 douradas.
-**A execução inicial em VT foi reportada OK em 2026-10-25**; ainda faltam
-registrar áudio audível, latência, CPU ocioso, restauração por cada caminho e
-24/16 bpp. Consulte `docs/06-roadmap.md`.
+**O teste manual completo em VT foi reportado OK em 2026-10-25** (fluxo,
+áudio, histórico, fade, paletas e saída). Ainda faltam 24/16 bpp, MSRV 1.88 e
+os detalhes de `SIGHUP`/pânico e medições de CPU/latência. Consulte
+`docs/06-roadmap.md`.
 
 ## O que funciona agora
 
@@ -41,8 +44,9 @@ registrar áudio audível, latência, CPU ocioso, restauração por cada caminho
 
 ## O que ainda não funciona
 
-- Validação detalhada em VT: áudio audível, restauração por cada caminho,
-  latência de tecla, CPU ocioso e modos 24/16 bpp (Fase 5).
+- Modos 24/16 bpp e resoluções alternativas (sem hardware/VM).
+- Detalhes de restauração em `SIGHUP`/pânico e medições formais de CPU/latência.
+- MSRV 1.88 (o release foi gerado com Rust 1.99.1).
 - Troca de VT durante a execução pode deixar resíduos; saia do app antes.
 
 ## Visão do produto
@@ -246,19 +250,19 @@ em execução; se isso acontecer, saia e reinicie.
 
 ### 5. Checklist rápido de aceite
 
-- [ ] `--version` mostra `calculadora 1.0.0`.
-- [ ] A captura gera PNG de 1344 × 756.
-- [ ] Duas capturas iguais têm o mesmo SHA-256.
-- [ ] `--lang en`, `--color never` e `--no-audio` alteram a captura.
-- [ ] A captura funciona com `--fb-device` inexistente.
-- [ ] Os portões automatizados passam com e sem features.
-- [ ] No VT, a tela aparece e o fluxo `200 + 10 % =` mostra `220`.
-- [ ] No VT, `↑`/`↓`/`Enter` navegam e recuperam o histórico.
-- [ ] No VT, `F2`/`M` funcionam e `Q` restaura o console.
-- [ ] No VT, clique/erro são audíveis; sem ALSA o status fica indisponível.
-- [ ] No VT, a fita anima com fade e `--no-animations` remove o movimento.
-- [ ] No VT, `--color 256`, `--color 16` e `--color never` são legíveis.
-- [ ] Sem permissão no fb, a mensagem orienta o grupo `video` (código 3).
+- [x] `--version` mostra `calculadora 1.0.0`.
+- [x] A captura gera PNG de 1344 × 756.
+- [x] Duas capturas iguais têm o mesmo SHA-256.
+- [x] `--lang en`, `--color never` e `--no-audio` alteram a captura.
+- [x] A captura funciona com `--fb-device` inexistente.
+- [x] Os portões automatizados passam com e sem features.
+- [x] No VT, a tela aparece e o fluxo `200 + 10 % =` mostra `220`.
+- [x] No VT, `↑`/`↓`/`Enter` navegam e recuperam o histórico.
+- [x] No VT, `F2`/`M` funcionam e `Q` restaura o console.
+- [x] No VT, clique/erro são audíveis; sem ALSA o status fica indisponível.
+- [x] No VT, a fita anima com fade e `--no-animations` remove o movimento.
+- [x] No VT, `--color 256`, `--color 16` e `--color never` são legíveis.
+- [x] Sem permissão no fb, a mensagem orienta o grupo `video` (código 3).
 
 ## Uso
 

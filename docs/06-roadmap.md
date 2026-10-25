@@ -180,7 +180,7 @@ Evidência headless: síntese testada sem hardware, backend ALSA com handshake e
 fallback silencioso, fade de 120 ms, contraste ≥ 4,5:1/10:1 e paletas
 douradas. Ver `docs/10-validation-log.md`.
 
-## Fase 5 — Release v1.0 (pacote local concluído em 2026-10-25)
+## Fase 5 — Release v1.0 (pacote local e teste manual em VT concluídos em 2026-10-25)
 
 **Escopo:** congelar, validar, empacotar e documentar.
 
@@ -201,13 +201,15 @@ Critérios de saída:
 - [x] Pacote com binário, README, licenças, notices, notas e créditos.
 - [x] `.sha256` verificado.
 - [x] Binário copiado sozinho funciona (smoke em `/tmp` sem `assets/`).
-- [x] Nenhum terminal/console corrompido na execução inicial em VT; detalhes
-  de restauração por caminho seguem pendentes.
+- [x] Nenhum terminal/console corrompido no teste manual completo em VT
+  (`Q`/`Esc`/`Ctrl+C`); `SIGHUP`/pânico seguem pendentes.
 - [x] `AGENTS.md` com hash do pacote, data e pendências.
 
 Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
-`63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`.
-Pendentes: detalhes manuais em VT, 24/16 bpp, MSRV 1.88, tag/release público.
+`daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`.
+Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
+formais de CPU/latência, MSRV 1.88 e tag/release público (repositório público
+solicitado).
 
 ## Fase 6 — Backlog
 

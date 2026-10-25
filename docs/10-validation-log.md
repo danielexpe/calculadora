@@ -155,10 +155,11 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | Pacote local + `.sha256` | verde | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
 | 2026-10-25 | Smoke do pacote em `/tmp` sem assets | verde | `--version`, captura 1344 × 756, PNG determinístico |
 | — | MSRV 1.88 | **PENDENTE** | apenas 1.99.1 instalado |
-| 2026-10-25 | Execução em `/dev/fb0` em VT | **OK (reportado pelo usuário)** | `amdgpudrmfb` 1920 × 1080 32 bpp; app iniciou e operou no VT |
+| 2026-10-25 | Execução em `/dev/fb0` em VT | **OK (teste completo reportado pelo usuário)** | `amdgpudrmfb` 1920 × 1080 32 bpp; fluxo, áudio, histórico, fade, paletas e saída |
 | — | 24 bpp / 16 bpp | **PENDENTE** | hardware/VM não confirmados |
-| — | Áudio real ouvido em VT | **PENDENTE** | backend implementado; confirmar clique/erro no teste detalhado |
-| — | Restauração de console (detalhe) | **PARCIAL** | app executou em VT; falta registrar `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico um a um |
+| 2026-10-25 | Áudio real ouvido em VT | **OK (reportado)** | clique em teclas aceitas e tom no erro |
+| 2026-10-25 | Restauração `Q`/`Esc`/`Ctrl+C` | **OK (reportado)** | console restaurado no teste manual |
+| — | Restauração `SIGTERM`/`SIGHUP`/pânico | **PENDENTE** | falta registro individual |
 
 ## 3.1 Evidência da Fase 2 (headless)
 
@@ -229,11 +230,14 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
 - Ambiente: `amdgpudrmfb`, 1920 × 1080, 32 bpp, VT local; usuário passou a
   integrar o grupo `video` e executou a partir do VT.
 - Comando: `./user_run_now.sh`.
-- Resultado reportado pelo usuário: **OK** (“funcionando ok dentro do VT”).
-- Escopo registrado: inicialização e operação do app no console real.
-- **Ainda não detalhado:** áudio audível, latência de tecla, CPU ocioso,
-  restauração por cada caminho (`Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico),
-  `SIGHUP`, 24/16 bpp e resoluções alternativas. Não tratar como validados.
+- Resultado reportado pelo usuário: **OK** no teste manual completo —
+  fluxo pt/en, áudio, histórico/recall, fade, paletas, `F2`, `M` e saída por
+  `Q`/`Esc`/`Ctrl+C`.
+- Um teste anterior foi repetido após identificar NumLock desligado no
+  teclado numérico; com NumLock ativo, as teclas numéricas funcionaram.
+- **Ainda não detalhado:** `SIGTERM`/`SIGHUP`/pânico, troca de VT, CPU ocioso,
+  medição formal de latência, 24/16 bpp e resoluções alternativas. Não tratar
+  como validados.
 
 ## 3.5 Evidência da Fase 5 (pacote local)
 
@@ -243,7 +247,7 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `RELEASE_NOTES.md` e
   textos OFL em `licenses/`; sem `assets/`.
 - SHA-256:
-  `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`
+  `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
   (verificado com `sha256sum -c`).
 - Smoke em `/tmp`: `--version` → `calculadora 1.0.0`; captura 1344 × 756
   determinística; binário roda fora da pasta do projeto.
@@ -360,4 +364,5 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Fase 3: fluxo Input→App→cena, histórico com rolagem/recall, flash/debounce, marcador de som, 16 capturas douradas, PTY e teste de sinal; 182 testes ativos + 2 auxiliares |
 | 2026-10-25 | Fase 4: áudio ALSA dinâmico + síntese, fade de histórico, contraste/paletas, compositor com fundo em cache, capturas regeneradas; 194 testes ativos + 2 auxiliares |
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário |
+| 2026-10-25 | Teste manual completo em VT reportado OK (áudio, fluxo, histórico, fade, paletas, saída) |
 | 2026-10-25 | Fase 5: versão 1.0.0, checklist, RELEASE_NOTES, pacote + sha256, smoke em /tmp |

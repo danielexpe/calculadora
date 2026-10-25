@@ -6,7 +6,7 @@
 > circular); ele fica aqui e no `AGENTS.md`.
 
 Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
-Hash SHA-256: `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`
+Hash SHA-256: `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84`
 
 ## Funcional
 
@@ -41,9 +41,9 @@ Hash SHA-256: `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`
 
 ## Manual em hardware
 
-Execução inicial em VT reportada **OK** pelo usuário em 2026-10-25
-(`amdgpudrmfb`, 1920 × 1080, 32 bpp). Os detalhes abaixo ainda não foram
-registrados individualmente.
+Teste manual completo em VT reportado **OK** pelo usuário em 2026-10-25
+(`amdgpudrmfb`, 1920 × 1080, 32 bpp). Itens não citados nesse teste permanecem
+explicitamente pendentes abaixo.
 
 - [x] Usuário no grupo `video` e sessão reiniciada.
 - [x] Execução em VT local (não Wayland/X11/SSH).
@@ -51,21 +51,21 @@ registrados individualmente.
 - [ ] 24 bpp validado **ou** marcado pendente — **pendente** (sem hardware/VM).
 - [ ] 16 bpp validado **ou** marcado pendente — **pendente** (sem hardware/VM).
 - [ ] Resolução alternativa validada **ou** marcada pendente — **pendente**.
-- [ ] Restauração em `Q`.
-- [ ] Restauração em `Esc`.
-- [ ] Restauração em `Ctrl+C`.
+- [x] Restauração em `Q`.
+- [x] Restauração em `Esc`.
+- [x] Restauração em `Ctrl+C`.
 - [ ] Restauração em `SIGTERM`.
 - [ ] Restauração em `SIGHUP`.
 - [ ] Restauração em pânico (build de teste).
-- [ ] Cursor reaparece; `KD_TEXT` restaurado; tela limpa.
+- [x] Cursor reaparece; `KD_TEXT` restaurado; tela limpa.
 - [ ] Troca de VT durante a execução: comportamento registrado.
-- [ ] Sem resíduos visuais, sem cursor piscando, sem texto de debug.
-- [ ] Fluxo completo em pt e en.
-- [ ] Histórico, seleção e recall em 10 entradas.
-- [ ] `NO_COLOR`, `--color 256`, `--color 16`, `--color never`.
-- [ ] `--no-animations` e `--no-audio`.
-- [ ] Áudio real ou silêncio sem dispositivo.
-- [ ] Latência perceptível < 50 ms.
+- [x] Sem resíduos visuais, sem cursor piscando, sem texto de debug.
+- [x] Fluxo completo em pt e en.
+- [x] Histórico, seleção e recall em 10 entradas.
+- [x] `NO_COLOR`, `--color 256`, `--color 16`, `--color never`.
+- [x] `--no-animations` e `--no-audio`.
+- [x] Áudio real ou silêncio sem dispositivo.
+- [x] Latência perceptível < 50 ms.
 
 ## Desempenho
 
@@ -91,7 +91,7 @@ registrados individualmente.
 - [x] `tar.gz` + `.sha256` gerados.
 - [x] `.sha256` verificado no diretório do pacote.
 - [x] Smoke test em `/tmp` sem `assets/`.
-- [ ] Tag/release somente se solicitado — **não solicitado**.
+- [ ] Tag/release somente se solicitado — **não solicitado** (repositório público foi solicitado; tag/release não).
 - [x] Hash e caminho registrados no `AGENTS.md`.
 
 ## Bloqueios conhecidos (2026-10-25)
@@ -101,11 +101,12 @@ registrados individualmente.
 - [x] P-03: resolvido; `rust_decimal` 1.43.0 pinada/testada.
 - [x] P-04: resolvido; fontes OFL baixadas e verificadas.
 - [ ] P-06: 24/16 bpp não confirmados — **pendente**.
-- [ ] P-07: release público — **não solicitado**.
+- [x] P-07: repositório público solicitado/criado na conta do usuário; tag/release não solicitados.
 - [ ] MSRV 1.88 não instalada no ambiente.
 
 ## Critério de release
 
-O pacote local v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`.
-Itens manuais detalhados, 24/16 bpp, MSRV 1.88 e release público permanecem
-explicitamente pendentes; nenhum deles foi declarado validado sem execução.
+O pacote local v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`,
+e o teste manual completo em VT foi reportado OK. 24/16 bpp, resoluções
+alternativas, `SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88
+permanecem explicitamente pendentes.

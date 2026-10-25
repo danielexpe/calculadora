@@ -53,12 +53,12 @@ mensagem acionável. Para QA sem framebuffer:
 - Portões automatizados verdes: `fmt`, `clippy` (com/sem features), 194 testes
   ativos, manifesto de assets e builds release.
 - 16 capturas douradas em `tests/snapshots/` (1344 × 756, comparação RGBA).
-- Execução inicial em VT real (`amdgpudrmfb`, 1920 × 1080, 32 bpp) reportada
-  **OK** pelo usuário em 2026-10-25.
-- **Pendências registradas:** detalhes de áudio audível, latência de tecla, CPU
-  ocioso, restauração por cada caminho (`Q`/`Esc`/`Ctrl+C`/`SIGTERM`/`SIGHUP`/
-  pânico), troca de VT e validação em 24/16 bpp ou resoluções alternativas.
-- A MSRV alvo é 1.88; o ambiente de release usou Rust 1.99.1.
+- Teste manual completo em VT real (`amdgpudrmfb`, 1920 × 1080, 32 bpp)
+  reportado **OK** pelo usuário em 2026-10-25: fluxo pt/en, áudio, histórico,
+  fade, paletas e saída por `Q`/`Esc`/`Ctrl+C`.
+- **Pendências registradas:** 24/16 bpp e resoluções alternativas, detalhes de
+  `SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88 (o release usou
+  Rust 1.99.1).
 
 ## Limitações conhecidas
 
