@@ -22,22 +22,23 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–4 implementadas; release local 1.0.0 empacotado |
+| Código de produção | Fases 1–5 implementadas; release 1.0.0 público |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
-| Fase 2 — Substrato fb | **concluída** (2026-10-25); VT inicial reportado OK |
+| Fase 2 — Substrato fb | **concluída** (2026-10-25); VT validado |
 | Testes | 194 ativos verdes (181 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
 | Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
-| Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT inicial reportado OK |
-| Fase 4 — Acabamento | **concluída** (2026-10-25); detalhes de áudio/latência/24-16 pendentes |
-| Fase 5 — Release | **concluída (pacote local)**; detalhes VT/24-16/público pendentes |
+| Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT validado |
+| Fase 4 — Acabamento | **concluída** (2026-10-25); teste manual completo em VT OK |
+| Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.0 |
 | Versão | **1.0.0** |
 | Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
 | SHA-256 do pacote | `daf707a5aeb67c13cbb7d5eaee20707d12e06e3a2b029d6e75ce73cfc2a15b84` |
-| Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
+| Validação em hardware | **teste manual completo OK** (2026-10-25); 24/16 e sinais/pânico pendentes |
 | Repositório git | `main` local; remoto público `origin` (GitHub) |
 | Repositório remoto | https://github.com/danielexpe/calculadora |
 | GitHub release | `v1.0.0` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
 | Commits/releases | `main` publicado; tag `v1.0.0` e GitHub release com `tar.gz` + `.sha256` |
+| Escopo | **encerrado na Fase 5**; sem Fase 6/backlog (D-020) |
 
 ## 3. Resumo do produto
 
@@ -98,23 +99,24 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 
 ## 6. Pendências e questões abertas
 
-| # | Pendência | Prazo | Dono |
-| --- | --- | --- | --- |
-| P-06 | Confirmar 24/16 bpp disponíveis ou marcar pendente | Fase 5 | usuário/agente |
-| P-08 | Decidir se TUI volta no backlog | Fase 6 | usuário |
+Nenhuma pendência bloqueante. O escopo foi encerrado na Fase 5 (D-020). Itens
+técnicos opcionais, já registrados como pendentes no release:
 
-P-01/P-02 foram concluídas em 2026-10-25: o usuário entrou no grupo `video`,
-abriu um VT local e reportou a execução inicial como OK. P-07 foi concluída
-com a criação do repositório público, sem tag/GitHub release. P-03/P-04/P-05 foram
-concluídas na Fase 1 (`rust_decimal` 1.43.0, quatro TTF OFL e licenças
-confirmadas). Na Fase 2, `tiny-skia` 0.12.0, `image` 0.25.10 (feature `png`),
-`libc` 0.2.191 e `bytemuck` 1.25.2 foram aprovados e adicionados. Na Fase 4,
-`libloading` foi usado para ALSA. Detalhes de 24/16 bpp, áudio audível,
-latência e restauração por caminho continuam pendentes.
+- 24/16 bpp e resoluções alternativas (sem hardware/VM).
+- `SIGTERM`/`SIGHUP`/pânico observados no console.
+- Medições formais de CPU ocioso/frame ocioso/latência.
+- MSRV 1.88 (release gerado com 1.99.1).
+
+P-01/P-02 foram concluídas em 2026-10-25 com o teste em VT. P-03/P-04/P-05
+foram concluídas na Fase 1 (`rust_decimal` 1.43.0, TTF OFL e licenças). Na
+Fase 2 entraram `tiny-skia` 0.12.0, `image` 0.25.10 (feature `png`), `libc`
+0.2.191 e `bytemuck` 1.25.2; na Fase 4, `libloading` para ALSA. P-07 foi
+concluída com repositório público, tag e GitHub release; P-08 foi encerrada
+com a exclusão da Fase 6.
 
 ## 7. Comandos e portões
 
-Portões atuais (Fase 4 verde):
+Portões atuais (Fase 5 verde):
 
 ```bash
 cargo fmt --all -- --check
@@ -223,11 +225,12 @@ Não registrar segredos. Não inventar progresso.
 | --- | --- | --- |
 | 0 | especificação e planejamento | concluída |
 | 1 | fundação pura, CLI, i18n, input, testes | **concluída** |
-| 2 | fbdev, console, texto, cena, captura | **concluída (headless)**; VT pendente |
-| 3 | fluxo completo, histórico, capturas douradas | **concluída**; VT inicial OK |
-| 4 | tema, som, a11y, desempenho | **concluída**; detalhes em VT pendentes |
-| 5 | validação em VT, pacote, docs | **pacote local concluído**; detalhes/público pendentes |
-| 6 | backlog (TUI, DRM/KMS, persistência) | não iniciado |
+| 2 | fbdev, console, texto, cena, captura | **concluída** |
+| 3 | fluxo completo, histórico, capturas douradas | **concluída** |
+| 4 | tema, som, a11y, desempenho | **concluída** |
+| 5 | validação em VT, pacote, docs | **concluída**; release público v1.0.0 |
+
+O escopo termina na Fase 5; não há Fase 6 nem backlog planejado (D-020).
 
 ## 12. Notas para a próxima sessão
 
@@ -235,12 +238,11 @@ Não registrar segredos. Não inventar progresso.
   e o teste manual completo em VT foi reportado **OK**. O repositório público
   `https://github.com/danielexpe/calculadora` foi criado com `main` enviado, e
   a release `v1.0.0` foi publicada com `tar.gz` + `.sha256`.
-- **Próximo passo (quando solicitado):** detalhar em VT áudio audível,
-  latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/`SIGHUP`/
-  pânico, `--no-animations`, `--color 256/16/never` e 24/16 bpp.
-- **Pendências técnicas:** MSRV 1.88 não instalada; 24/16 bpp/resoluções
-  alternativas não validados; `SIGHUP`/pânico e medições de CPU/latência não
-  registrados. O release público `v1.0.0` já existe; novas tags só com pedido.
+- **Não há próxima fase planejada.** O escopo foi encerrado na Fase 5 (D-020);
+  apenas validações técnicas opcionais permanecem.
+- **Validações opcionais:** MSRV 1.88; 24/16 bpp/resoluções alternativas;
+  `SIGTERM`/`SIGHUP`/pânico observados no console; medições de CPU/latência.
+  O release público `v1.0.0` já existe; novas tags só com pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;

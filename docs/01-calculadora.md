@@ -54,7 +54,7 @@ improvisado.
 - Rede, contas, nuvem, telemetria.
 - Windows, macOS, Wayland nativo, X11 nativo.
 - DRM/KMS na v1; fbdev é o backend oficial.
-- Backend TUI interativo (ver ADR D-001; pode voltar no backlog).
+- Backend TUI interativo (ver ADR D-001; fora de escopo, sem fase de backlog).
 
 ## 4. Tela e fluxo
 
@@ -341,11 +341,14 @@ Estados:
 | CA-13 | Nenhuma string traduzida estoura o layout em pt-BR ou en. |
 | CA-14 | Nenhum log é impresso no meio do framebuffer. |
 
-## 12. Backlog pós-v1
+## 12. Escopo encerrado
+
+A v1.0.0 encerra o escopo: não há Fase 6 nem backlog planejado (D-020). Os
+itens abaixo permanecem fora do produto:
 
 1. Backend TUI (`ratatui`) para SSH/desenvolvimento.
 2. DRM/KMS.
-3. Persistência opcional de histórico e preferências.
+3. Persistência de histórico e preferências.
 4. Mouse/toque nas teclas.
 5. Funções científicas e parênteses.
 6. Repetição da última operação com `=`.

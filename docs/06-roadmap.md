@@ -11,11 +11,10 @@
 | --- | --- | --- |
 | 0 — Descoberta | congelar escopo, regras e riscos | docs 01–08 + AGENTS.md |
 | 1 — Fundação | domínio puro, CLI, i18n, entrada | cálculo testado, `--capture-frame` ainda não |
-| 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25); VT pendente |
-| 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída (headless)**; VT pendente |
-| 4 — Acabamento | tema, som, a11y, desempenho | **concluída (headless)**; VT pendente |
-| 5 — Release v1.0 | validação em VT, pacote, docs | **pacote local concluído**; detalhes VT/público pendentes |
-| 6 — Backlog | TUI, DRM/KMS, persistência | priorizado pelo usuário |
+| 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25) |
+| 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída** (2026-10-25) |
+| 4 — Acabamento | tema, som, a11y, desempenho | **concluída** (2026-10-25) |
+| 5 — Release v1.0 | validação em VT, pacote, docs | **concluída** (2026-10-25); release público v1.0.0 |
 
 ## Fase 0 — Descoberta (concluída)
 
@@ -212,24 +211,10 @@ Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
 Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
 formais de CPU/latência e MSRV 1.88.
 
-## Fase 6 — Backlog
-
-Priorizar com o usuário; não iniciar sem pedido.
-
-1. Backend TUI (`ratatui`) para SSH/desenvolvimento.
-2. DRM/KMS.
-3. Persistência opcional de histórico/preferências.
-4. Mouse/toque.
-5. Funções científicas e parênteses.
-6. Repetição de `=`.
-7. Remapeamento de teclas.
-8. Temas claro e alto contraste.
-
 ## Dependências entre fases
 
 ```text
 0 -> 1 -> 2 -> 3 -> 4 -> 5
-                 \-> 6 (backlog)
 ```
 
 - A Fase 2 pode produzir capturas estáticas antes do fluxo completo.
@@ -238,6 +223,7 @@ Priorizar com o usuário; não iniciar sem pedido.
 - A Fase 5 só começa com portões verdes.
 - Bloqueios de hardware não impedem o que for testável sem fb; ficam
   registrados e não são declarados validados.
+- O escopo termina na Fase 5; não há Fase 6 nem backlog planejado (D-020).
 
 ## Marcos verificáveis
 

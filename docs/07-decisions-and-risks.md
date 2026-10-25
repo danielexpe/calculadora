@@ -14,8 +14,8 @@
 - **Decisão:** a v1 tem apenas backend fbdev. Não há `ratatui`, `ratatui-image`
   nem fallback TUI. `crossterm` permanece apenas para raw mode/input.
 - **Consequências:** não funciona em SSH/X11/Wayland; exige VT local e
-  `/dev/fb0`; QA sem hardware usa `--capture-frame`; TUI volta no backlog
-  (Fase 6) se o usuário quiser.
+  `/dev/fb0`; QA sem hardware usa `--capture-frame`. A possibilidade de TUI
+  ficou fora do escopo com a D-020.
 
 ### D-002 — `fb` é o backend padrão e não há `auto`
 
@@ -26,7 +26,7 @@
   `tui`/`auto` falham no clap com código 2. Falha de fb produz código 3 com
   causa e ação.
 - **Consequências:** desvio explícito do template; documentado em README e
-  testes. Quando houver TUI no backlog, `auto` pode ser reintroduzido.
+  testes. Não há plano de reintroduzir `auto`/TUI (D-020).
 
 ### D-003 — Aritmética decimal via `rust_decimal`
 
@@ -58,8 +58,8 @@
 - **Contexto:** persistência adiciona I/O, formato, migração e privacidade;
   não foi pedida.
 - **Decisão:** fita em memória, 50 entradas, sem gravar em disco.
-- **Consequências:** fechar o app perde o histórico; persistência fica no
-  backlog. Nenhum caminho de configuração em `$HOME` na v1.
+- **Consequências:** fechar o app perde o histórico; persistência fica fora do
+  escopo (D-020). Nenhum caminho de configuração em `$HOME` na v1.
 
 ### D-006 — Separador decimal localizado com entrada tolerante
 
@@ -166,7 +166,7 @@
 - **Decisão:** `xtask` valida presença/hash/tamanho de fontes e gera manifesto
   FNV-1a 64. Sem download, sem SVG→PNG, sem dependências externas.
 - **Consequências:** `cargo xtask assets --check` continua sendo portão; FNV
-  detecta drift, não é segurança. Arte raster pode voltar no backlog.
+  detecta drift, não é segurança. Arte raster permanece fora do escopo.
 
 ### D-017 — Entrada ativa pode ocupar 17 caracteres
 
@@ -213,6 +213,19 @@
   `platform/audio.rs`; ausência de ALSA/dispositivo vira status
   “Som indisponível”, nunca erro fatal; o loop usa `try_send` e não bloqueia.
 
+### D-020 — Escopo encerrado na Fase 5; sem Fase 6 ou backlog
+
+- **Status:** aceita.
+- **Contexto:** o usuário confirmou que a aplicação atende a tudo o que precisa
+  e pediu para excluir a Fase 6.
+- **Decisão:** o roadmap termina na Fase 5. Não há Fase 6 nem backlog
+  planejado; TUI, DRM/KMS, persistência, mouse, científica, repetição de `=`,
+  remapeamento e temas alternativos permanecem fora de escopo.
+- **Consequências:** P-08 deixa de existir; docs/01, docs/06, docs/07 e
+  `AGENTS.md` não devem anunciar fases futuras. Correções e validações
+  opcionais da v1.0.0 (24/16 bpp, `SIGHUP`/pânico, MSRV) podem ser feitas sem
+  reabrir escopo de produto.
+
 ## 2. Premissas
 
 - O usuário pode entrar no grupo `video` e fazer novo login.
@@ -229,33 +242,32 @@
 
 | ID | Risco | Prob. | Impacto | Mitigação | Status |
 | --- | --- | --- | --- | --- | --- |
-| R-001 | Usuário fora do grupo `video` | alta | bloqueia fb | `usermod -aG video` + relogin; mensagem clara | **aberto** |
-| R-002 | Sessão Wayland/X11 ativa; `KDSETMODE` falha | alta | bloqueia fb | executar em VT local; código 3 com instrução | **aberto** |
+| R-001 | Usuário fora do grupo `video` | alta | bloqueia fb | `usermod -aG video` + relogin; mensagem clara | resolvido |
+| R-002 | Sessão Wayland/X11 ativa; `KDSETMODE` falha | alta | bloqueia fb | executar em VT local; código 3 com instrução | resolvido |
 | R-003 | `rust_decimal` ausente do cache; download falha | média | atrasa Fase 1 | baixada 1.43.0, pinada e testada | resolvido |
 | R-004 | Capturas variam por versão de fonte/rasterizador | média | falsos negativos | lock pinado; mesma toolchain; revisão de diff | aberto |
-| R-005 | `amdgpudrmfb` sem `ypan` ou com comportamento distinto | média | tearing/performance | detectar `ypan`; fallback escrita direta | aberto |
-| R-006 | Sem TUI, desenvolvimento/SSH ficam limitados | média | produtividade | `--capture-frame`; testes headless; TUI no backlog | aceito |
-| R-007 | Contraste ruim em 16/mono | média | acessibilidade | capturas por paleta; testes de contraste; relevo | aberto |
+| R-005 | `amdgpudrmfb` sem `ypan` ou com comportamento distinto | média | tearing/performance | detectar `ypan`; escrita direta do frame | resolvido |
+| R-006 | Sem TUI, desenvolvimento/SSH ficam limitados | média | produtividade | `--capture-frame`; testes headless; TUI fora de escopo (D-020) | aceito |
+| R-007 | Contraste ruim em 16/mono | média | acessibilidade | capturas por paleta; testes de contraste; relevo | resolvido |
 | R-008 | Usuário esperar `0,10` literal em `%` | baixa | confusão | exemplos no README/UI; testes | aceito |
 | R-009 | Arredondamento em 8 casas surpreender | baixa | confusão | documentar limite; mensagem nos docs | aceito |
 | R-010 | Áudio sem dispositivo | baixa | silêncio inesperado | status “Som indisponível”; sem erro fatal | aceito |
-| R-011 | Glifo faltante em fonte | média | texto quebrado | teste de cobertura; primitiva/alternativa | aberto |
+| R-011 | Glifo faltante em fonte | média | texto quebrado | teste de cobertura; primitiva/alternativa | resolvido |
 | R-012 | Troca de VT deixa resíduos | baixa | console sujo | documentar; restaurar em Drop/sinais | aberto |
-| R-013 | Escopo crescer (científica, mouse, persistência) | baixa | atraso | não-objetivos congelados; backlog | aceito |
-| R-014 | Licença de dependência divergir da expectativa | baixa | bloqueio de release | `cargo metadata` antes do release | aberto |
+| R-013 | Escopo crescer (científica, mouse, persistência) | baixa | atraso | não-objetivos congelados; escopo encerrado (D-020) | aceito |
+| R-014 | Licença de dependência divergir da expectativa | baixa | bloqueio de release | `cargo metadata`/notices conferidos no release | resolvido |
 | R-015 | `unsafe` de ioctl/mmap com ABI errada | baixa | crash/corrupção | const asserts 160/80; validação; testes implementados; falta VT real | aberto |
-| R-016 | Fonte grande demais para o orçamento | baixa | binário > 15 MB | assets medidos em 1,39 MB; subset no backlog | resolvido |
+| R-016 | Fonte grande demais para o orçamento | baixa | binário > 15 MB | assets medidos em 1,39 MB; subset fora de escopo | resolvido |
 
 ## 4. Questões abertas
 
-Nenhuma questão **bloqueante** de produto. Pendências operacionais:
+Nenhuma questão **bloqueante** de produto. O escopo foi encerrado (D-020) e o
+release público v1.0.0 foi publicado. Validações opcionais que podem ser feitas
+sem reabrir escopo:
 
-1. Adicionar `daniel` ao grupo `video` e relogar (R-001).
-2. Escolher o VT para validação manual (ex.: tty3) e confirmar que está livre
-   (R-002).
-3. Confirmar disponibilidade de hardware/VM 24/16 bpp; se não houver, marcar
-   como pendente no release (D-012).
-4. Definir se haverá release público; por padrão, **não** publicar sem pedido.
+1. 24/16 bpp e resoluções alternativas, se houver hardware/VM (D-012).
+2. `SIGTERM`/`SIGHUP`/pânico e medições formais de CPU/latência.
+3. MSRV 1.88.
 
 Defaults já congelados, sem necessidade de nova pergunta:
 
