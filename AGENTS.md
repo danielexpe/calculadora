@@ -218,6 +218,10 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Fase 5 local: versão 1.0.0, RELEASE_NOTES, checklist, pacote tar.gz + sha256, smoke em /tmp sem assets; sem tag/push | `Cargo.toml`, `Cargo.lock`, `RELEASE_NOTES.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | `73eac45` |
+| 2026-10-25 | Teste manual completo em VT reportado OK; pacote 1.0.0 regenerado (hash `daf707a5…`) e documentação final | `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md` | `2773796` |
+| 2026-10-25 | Repositório público criado, `main` enviado e teste final registrado | `.git/config`, `AGENTS.md`, `docs/**` | `76fd036` |
+| 2026-10-25 | Tag `v1.0.0` e GitHub release público com `tar.gz` + `.sha256`; assets verificados por download | `README.md`, `AGENTS.md`, `docs/**` | `ea20484` |
+| 2026-10-25 | Housekeeping: Fase 6/backlog removidos (D-020), status final e pendências opcionais | `AGENTS.md`, `docs/01-calculadora.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` | `6cdc306` |
 
 ## 11. Fases
 
