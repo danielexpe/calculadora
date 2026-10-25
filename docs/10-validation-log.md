@@ -19,7 +19,7 @@
 | Sessão | Wayland (`XDG_SESSION_TYPE=wayland`, `DISPLAY=:0`) |
 | VT ativo | `tty2` (ocupado pela sessão gráfica) |
 | `/dev/tty` no shell | **não é TTY** |
-| Repositório git | inicializado em 2026-10-25 (`main`), sem commits |
+| Repositório git | inicializado em 2026-10-25 (`main`); commit inicial `ed07e19` |
 
 Comandos executados:
 
@@ -55,7 +55,7 @@ Interpretação:
 - A sessão atual não é um VT de console; o backend fb exige VT local.
 - `/dev/tty` no shell atual aponta para um pty, não para o VT; a validação real
   precisa ser feita a partir de um VT (ex.: tty3).
-- O repositório git local foi inicializado em `main`; não há commits.
+- O repositório git local foi inicializado em `main`; commit inicial `ed07e19`.
 - O binário da Fase 1 existe, mas é um placeholder: a CLI é executada nos
   testes de processo; fb, captura e áudio ainda não foram implementados.
 
@@ -112,7 +112,7 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | Auditoria de ambiente | concluída | seção 1 |
 | 2026-10-25 | Cache de crates | concluída | seção 2 |
 | 2026-10-25 | Documentos 01–10 + AGENTS | concluída | arquivos no repo |
-| 2026-10-25 | Repositório git local | concluída | `git init -b main`; branch `main`; sem commits |
+| 2026-10-25 | Repositório git local | concluída | `git init -b main`; commit inicial `ed07e19` |
 | 2026-10-25 | Dependências e fontes | concluída | `rust_decimal` 1.43.0; Inter 4.1; JBM 2.304 |
 | 2026-10-25 | `cargo fmt --all -- --check` | verde | Fase 1 |
 | 2026-10-25 | `cargo clippy --workspace --all-targets -- -D warnings` | verde | Fase 1 |
@@ -226,5 +226,6 @@ Preencher apenas com medições reais em release.
 | Data | Mudança |
 | --- | --- |
 | 2026-10-25 | Criação do log; auditoria inicial; nenhuma validação de software executada |
-| 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado; nenhum commit |
-| 2026-10-25 | Fase 1: domínio, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados; nenhum commit |
+| 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado |
+| 2026-10-25 | Fase 1: domínio, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados |
+| 2026-10-25 | Commit inicial `ed07e19` com especificação e Fase 1 |

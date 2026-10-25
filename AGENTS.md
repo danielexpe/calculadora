@@ -9,8 +9,8 @@
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
 3. Verificar `git status` — repositório local inicializado em 2026-10-25 na
-   branch `main`, **sem commits**. Não criar commit, push, tag ou release sem
-   pedido explícito.
+   branch `main`, com commit inicial `ed07e19`. Não criar novo commit, push,
+   tag ou release sem pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
 5. Não iniciar fase sem pedido explícito; as Fases 0 e 1 estão concluídas.
 
@@ -29,8 +29,8 @@
 | Fase 4 — Acabamento | pendente |
 | Fase 5 — Release | pendente |
 | Validação em hardware | **pendente** (grupo `video` e VT) |
-| Repositório git | inicializado em `main`, sem commits |
-| Commits/releases | nenhum |
+| Repositório git | inicializado em `main`; commit inicial `ed07e19` |
+| Commits/releases | 1 commit local (`ed07e19`); nenhum push/release |
 
 ## 3. Resumo do produto
 
@@ -185,9 +185,9 @@ Não registrar segredos. Não inventar progresso.
 | Data | Resumo | Arquivos | Commit |
 | --- | --- | --- | --- |
 | 2026-10-25 | Auditoria do ambiente: fb0/amdgpudrmfb 1080p 32bpp, usuário fora de `video`, sessão Wayland no tty2, Rust 1.99.1, cache de crates | — | n/a |
-| 2026-10-25 | Fase 0: criados README, docs 01–10 e AGENTS.md; decisões e riscos congelados; nenhum código | `README.md`, `docs/*`, `AGENTS.md` | n/a |
-| 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado; nenhum commit | `.gitignore`, `AGENTS.md`, `docs/10-validation-log.md` | n/a |
-| 2026-10-25 | Fase 1: domínio decimal/calculator/history, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados; sem commit | `Cargo.toml`, `Cargo.lock`, `src/**`, `tests/**`, `xtask/**`, `assets/**`, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | n/a |
+| 2026-10-25 | Fase 0: criados README, docs 01–10 e AGENTS.md; decisões e riscos congelados; nenhum código | `README.md`, `docs/*`, `AGENTS.md` | `ed07e19` |
+| 2026-10-25 | Repositório git local inicializado em `main`; `.gitignore` criado | `.gitignore`, `AGENTS.md`, `docs/10-validation-log.md` | `ed07e19` |
+| 2026-10-25 | Fase 1: domínio decimal/calculator/history, CLI, i18n, input, state, TTY, assets e xtask; 112 testes; fontes e `rust_decimal` baixados | `Cargo.toml`, `Cargo.lock`, `src/**`, `tests/**`, `xtask/**`, `assets/**`, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `docs/**`, `AGENTS.md` | `ed07e19` |
 
 ## 11. Fases
 
