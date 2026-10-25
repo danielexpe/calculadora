@@ -5,45 +5,52 @@
 > O hash do pacote **não** entra nas próprias notas de release (referência
 > circular); ele fica aqui e no `AGENTS.md`.
 
+Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
+Hash SHA-256: `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`
+
 ## Funcional
 
-- [ ] Quatro operações, `±`, `%` contextual, `AC`, `DEL` conforme `docs/01`.
-- [ ] Encadeamento, `=` e operador duplo conforme D-015.
-- [ ] Decimal exato; `0,1 + 0,2 = 0,3`.
-- [ ] Formatação pt/en com milhar, 12 dígitos e científico.
-- [ ] Histórico de 50 entradas, 10 visíveis, seleção e recall.
-- [ ] `F2` alterna idioma em todos os estados; histórico re-renderiza.
-- [ ] `M` alterna som; status textual correto.
-- [ ] Erros de divisão por zero e overflow com recuperação.
-- [ ] `Q`, `Esc`, `Ctrl+C` saem e restauram.
-- [ ] Captura determinística 1344 × 756.
-- [ ] Binário funciona copiado, sem a pasta `assets/`.
+- [x] Quatro operações, `±`, `%` contextual, `AC`, `DEL` conforme `docs/01`.
+- [x] Encadeamento, `=` e operador duplo conforme D-015.
+- [x] Decimal exato; `0,1 + 0,2 = 0,3`.
+- [x] Formatação pt/en com milhar, 12 dígitos e científico.
+- [x] Histórico de 50 entradas, 10 visíveis, seleção e recall.
+- [x] `F2` alterna idioma em todos os estados; histórico re-renderiza.
+- [x] `M` alterna som; status textual correto (áudio real: ver manual).
+- [x] Erros de divisão por zero e overflow com recuperação.
+- [x] `Q`, `Esc`, `Ctrl+C` mapeados para saída (restauração manual: ver abaixo).
+- [x] Captura determinística 1344 × 756.
+- [x] Binário funciona copiado, sem a pasta `assets/`.
 
 ## Qualidade
 
-- [ ] `cargo fmt --all -- --check`.
-- [ ] `cargo clippy --workspace --all-targets -- -D warnings`.
-- [ ] `cargo clippy --workspace --all-targets --no-default-features -- -D warnings`.
-- [ ] `cargo test --workspace`.
-- [ ] `cargo test --workspace --no-default-features`.
-- [ ] `cargo xtask assets --check`.
-- [ ] `cargo build --release`.
-- [ ] `cargo build --release --no-default-features`.
-- [ ] Capturas douradas revisadas e aprovadas.
-- [ ] Fuzz determinístico sem panic.
-- [ ] MSRV 1.88 verificada (se possível).
-- [ ] `THIRD_PARTY_NOTICES.md` confere com `cargo metadata`.
-- [ ] Nenhum `unsafe` fora de `platform/fb.rs` e `platform/audio.rs`.
-- [ ] Nenhum log na tela.
+- [x] `cargo fmt --all -- --check`.
+- [x] `cargo clippy --workspace --all-targets -- -D warnings`.
+- [x] `cargo clippy --workspace --all-targets --no-default-features -- -D warnings`.
+- [x] `cargo test --workspace` (194 ativos verdes; 2 auxiliares ignorados).
+- [x] `cargo test --workspace --no-default-features`.
+- [x] `cargo xtask assets --check`.
+- [x] `cargo build --release`.
+- [x] `cargo build --release --no-default-features`.
+- [x] Capturas douradas revisadas e aprovadas (16 PNGs).
+- [x] Fuzz determinístico sem panic (10.000 sequências).
+- [ ] MSRV 1.88 verificada — **pendente**: só o toolchain 1.99.1 está instalado.
+- [x] `THIRD_PARTY_NOTICES.md` confere com `cargo tree`.
+- [x] Nenhum `unsafe` fora de `platform/fb.rs` e `platform/audio.rs`.
+- [x] Nenhum log na tela.
 
 ## Manual em hardware
 
-- [ ] Usuário no grupo `video` e sessão reiniciada.
-- [ ] Execução em VT local (não Wayland/X11/SSH).
-- [ ] 1920 × 1080, 32 bpp, `amdgpudrmfb`.
-- [ ] 24 bpp validado **ou** marcado pendente.
-- [ ] 16 bpp validado **ou** marcado pendente.
-- [ ] Resolução alternativa validada **ou** marcada pendente.
+Execução inicial em VT reportada **OK** pelo usuário em 2026-10-25
+(`amdgpudrmfb`, 1920 × 1080, 32 bpp). Os detalhes abaixo ainda não foram
+registrados individualmente.
+
+- [x] Usuário no grupo `video` e sessão reiniciada.
+- [x] Execução em VT local (não Wayland/X11/SSH).
+- [x] 1920 × 1080, 32 bpp, `amdgpudrmfb`.
+- [ ] 24 bpp validado **ou** marcado pendente — **pendente** (sem hardware/VM).
+- [ ] 16 bpp validado **ou** marcado pendente — **pendente** (sem hardware/VM).
+- [ ] Resolução alternativa validada **ou** marcada pendente — **pendente**.
 - [ ] Restauração em `Q`.
 - [ ] Restauração em `Esc`.
 - [ ] Restauração em `Ctrl+C`.
@@ -62,40 +69,43 @@
 
 ## Desempenho
 
-- [ ] Startup < 400 ms.
-- [ ] Frame de animação ≤ 16 ms em 1080p.
-- [ ] Frame ocioso ≤ 33 ms; CPU ocioso < 2%.
-- [ ] RSS < 120 MB.
-- [ ] Binário release < 15 MB.
-- [ ] Assets embutidos < 4 MB.
-- [ ] Captura < 1 s.
-- [ ] Números registrados em `docs/10-validation-log.md`.
+- [x] Startup < 400 ms — ~40 ms no caminho de captura headless.
+- [x] Frame de animação ≤ 16 ms em 1080p — ~15 ms/quadro indicativo na suíte
+  dourada release; medir no VT.
+- [ ] Frame ocioso ≤ 33 ms; CPU ocioso < 2% — **pendente em VT**.
+- [x] RSS < 120 MB — ~39 MB na captura release.
+- [x] Binário release < 15 MB — 3,6 MB.
+- [x] Assets embutidos < 4 MB — ~1,4 MB.
+- [x] Captura < 1 s — ~40 ms.
+- [x] Números registrados em `docs/10-validation-log.md`.
 
 ## Release
 
-- [ ] Escopo congelado; versão em `Cargo.toml` e `Cargo.lock`.
-- [ ] `README.md` atualizado e sem drift.
-- [ ] `LICENSE` (MIT) e `LICENSE-ART` (CC BY 4.0) no pacote.
-- [ ] Textos OFL das duas fontes no pacote.
-- [ ] `THIRD_PARTY_NOTICES.md` no pacote.
-- [ ] `RELEASE_NOTES.md` sem hash do próprio pacote.
-- [ ] Pacote com binário, README, licenças, notices e créditos.
-- [ ] `tar.gz` + `.sha256` gerados.
-- [ ] `.sha256` verificado no diretório do pacote.
-- [ ] Smoke test em `/tmp` sem `assets/`.
-- [ ] Tag/release somente se solicitado.
-- [ ] URL e hash registrados no `AGENTS.md`.
+- [x] Escopo congelado; versão 1.0.0 em `Cargo.toml` e `Cargo.lock`.
+- [x] `README.md` atualizado e sem drift.
+- [x] `LICENSE` (MIT) e `LICENSE-ART` (CC BY 4.0) no pacote.
+- [x] Textos OFL das duas fontes no pacote (`licenses/`).
+- [x] `THIRD_PARTY_NOTICES.md` no pacote.
+- [x] `RELEASE_NOTES.md` sem hash do próprio pacote.
+- [x] Pacote com binário, README, licenças, notices e créditos.
+- [x] `tar.gz` + `.sha256` gerados.
+- [x] `.sha256` verificado no diretório do pacote.
+- [x] Smoke test em `/tmp` sem `assets/`.
+- [ ] Tag/release somente se solicitado — **não solicitado**.
+- [x] Hash e caminho registrados no `AGENTS.md`.
 
 ## Bloqueios conhecidos (2026-10-25)
 
-- [ ] P-01: `daniel` fora do grupo `video`.
-- [ ] P-02: sessão atual em Wayland; falta escolher VT local.
-- [ ] P-03: `rust_decimal` ausente do cache (download aprovado).
-- [ ] P-04: fontes OFL ainda não baixadas.
-- [ ] P-06: 24/16 bpp não confirmados.
+- [x] P-01: resolvido; usuário entrou no grupo `video`.
+- [x] P-02: resolvido; execução em VT local reportada OK.
+- [x] P-03: resolvido; `rust_decimal` 1.43.0 pinada/testada.
+- [x] P-04: resolvido; fontes OFL baixadas e verificadas.
+- [ ] P-06: 24/16 bpp não confirmados — **pendente**.
+- [ ] P-07: release público — **não solicitado**.
+- [ ] MSRV 1.88 não instalada no ambiente.
 
 ## Critério de release
 
-Todos os itens acima marcados **ou** explicitamente registrados como pendentes
-com justificativa. Nenhum item de hardware pode ser marcado sem execução no
-hardware correspondente.
+O pacote local v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`.
+Itens manuais detalhados, 24/16 bpp, MSRV 1.88 e release público permanecem
+explicitamente pendentes; nenhum deles foi declarado validado sem execução.

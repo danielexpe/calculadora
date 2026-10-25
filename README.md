@@ -7,7 +7,7 @@ framebuffer (`/dev/fb0`), sem X11/Wayland, sem rede e sem dependência de
 servidor gráfico. Interface escura, tipografia cuidada, fita de histórico e
 suporte a português e inglês.
 
-**Versão inicial 0.1.0 — Fases 1 a 4 concluídas em 2026-10-25.** O fluxo
+**Versão 1.0.0 — Fases 1 a 4 concluídas em 2026-10-25.** O fluxo
 completo funciona: digitação, quatro operações, porcentagem, sinal, AC/DEL,
 erros, fita com rolagem/recall, `F2`, `M`, flash, debounce, fade da fita, áudio
 sintetizado com fallback silencioso, paletas e captura PNG com 16 douradas.
@@ -56,6 +56,21 @@ registrar áudio audível, latência, CPU ocioso, restauração por cada caminho
 - Clique de tecla opcional sintetizado em runtime; sem arquivos de áudio.
 - Acesso por teclado; mouse fora do escopo da v1.
 
+## Pacote distribuído
+
+O pacote `calculadora-1.0.0-linux-x86_64.tar.gz` contém o binário, README,
+licenças, notices, notas de release e textos OFL. Ele não depende da pasta
+`assets/`:
+
+```bash
+tar -xzf calculadora-1.0.0-linux-x86_64.tar.gz
+cd calculadora-1.0.0-linux-x86_64
+./calculadora --version
+./calculadora              # execute em um VT local
+```
+
+O checksum acompanha o pacote em `calculadora-1.0.0-linux-x86_64.tar.gz.sha256`.
+
 ## Requisitos
 
 - Linux x86_64 local, com VT ativo para usar o framebuffer (não serve sessão
@@ -92,7 +107,7 @@ cargo build --release
 ./target/release/calculadora --version
 ```
 
-Saída esperada: `calculadora 0.1.0`.
+Saída esperada: `calculadora 1.0.0`.
 
 O binário é autossuficiente: as fontes estão embutidas e nada é lido do disco
 em runtime. Para confirmar, copie-o para outro diretório e gere uma captura:
@@ -231,7 +246,7 @@ em execução; se isso acontecer, saia e reinicie.
 
 ### 5. Checklist rápido de aceite
 
-- [ ] `--version` mostra `calculadora 0.1.0`.
+- [ ] `--version` mostra `calculadora 1.0.0`.
 - [ ] A captura gera PNG de 1344 × 756.
 - [ ] Duas capturas iguais têm o mesmo SHA-256.
 - [ ] `--lang en`, `--color never` e `--no-audio` alteram a captura.

@@ -9,11 +9,11 @@
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
 3. Verificar `git status` — repositório local em `main`, commits `ed07e19`,
-   `7923129`, `f691b0c` e `ab0dd65`. Não criar novo commit, push, tag ou release sem
-   pedido explícito.
+   `7923129`, `f691b0c`, `ab0dd65` e `ac97f03`. Não criar novo commit, push,
+   tag ou release sem pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
-5. Não iniciar fase sem pedido explícito; as Fases 0–3 estão concluídas no
-   caminho headless (VT/hardware pendente).
+5. Não iniciar fase sem pedido explícito; as Fases 0–5 estão concluídas no
+   escopo local. Detalhes manuais, 24/16 bpp e release público pendentes.
 
 ## 2. Status atual
 
@@ -22,14 +22,17 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–4 implementadas; execução inicial em VT reportada OK |
+| Código de produção | Fases 1–4 implementadas; release local 1.0.0 empacotado |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
 | Fase 2 — Substrato fb | **concluída** (2026-10-25); VT inicial reportado OK |
 | Testes | 194 ativos verdes (181 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
 | Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
 | Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT inicial reportado OK |
 | Fase 4 — Acabamento | **concluída** (2026-10-25); detalhes de áudio/latência/24-16 pendentes |
-| Fase 5 — Release | pendente |
+| Fase 5 — Release | **concluída (pacote local)**; detalhes VT/24-16/público pendentes |
+| Versão | **1.0.0** |
+| Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
+| SHA-256 do pacote | `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023` |
 | Validação em hardware | **inicial OK reportado** (2026-10-25); detalhes pendentes |
 | Repositório git | inicializado em `main`; commits `ed07e19`, `7923129`, `f691b0c`, `ab0dd65`, `ac97f03` |
 | Commits/releases | 6 commits locais (4 de feature + 2 de registro); nenhum push/release |
@@ -210,6 +213,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Fase 4: áudio sintetizado + ALSA dinâmico (feature audio), fade de 120 ms, contraste/paletas corrigidos, compositor com fundo em cache, 16 douradas regeneradas e README/docs atualizados; 194 testes ativos + 2 auxiliares | `src/audio.rs`, `src/platform/audio.rs`, `src/app.rs`, `src/theme.rs`, `src/render/fb.rs`, `src/render/scene.rs`, `tests/cli_process.rs`, `tests/snapshots/**`, `Cargo.toml`, `README.md`, `docs/**`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Script `user_run_now.sh` para build/preflight (fb, grupo, ALSA, captura) e execução no VT, com `--check`, `--no-build` e flags repassadas | `user_run_now.sh`, `README.md`, `AGENTS.md` | `ac97f03` |
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário; B-01/B-02 resolvidos, detalhes de áudio/latência/24-16 pendentes | `docs/06-roadmap.md`, `docs/10-validation-log.md`, `README.md`, `AGENTS.md` | `ac97f03` |
+| 2026-10-25 | Fase 5 local: versão 1.0.0, RELEASE_NOTES, checklist, pacote tar.gz + sha256, smoke em /tmp sem assets; sem tag/push | `Cargo.toml`, `Cargo.lock`, `RELEASE_NOTES.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | pendente (sem commit) |
 
 ## 11. Fases
 
@@ -220,17 +224,18 @@ Não registrar segredos. Não inventar progresso.
 | 2 | fbdev, console, texto, cena, captura | **concluída (headless)**; VT pendente |
 | 3 | fluxo completo, histórico, capturas douradas | **concluída**; VT inicial OK |
 | 4 | tema, som, a11y, desempenho | **concluída**; detalhes em VT pendentes |
-| 5 | validação em VT, pacote, docs | pendente |
+| 5 | validação em VT, pacote, docs | **pacote local concluído**; detalhes/público pendentes |
 | 6 | backlog (TUI, DRM/KMS, persistência) | não iniciado |
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1–4 estão implementadas e a execução inicial em VT foi reportada
-  **OK** pelo usuário (2026-10-25). A Fase 5 (validação detalhada, pacote e
-  release) só começa com pedido explícito.
+- As Fases 1–5 estão concluídas no escopo local; o pacote v1.0.0 foi gerado e
+  testado em `/tmp`. A execução inicial em VT foi reportada **OK**.
 - **Próximo passo (quando solicitado):** detalhar em VT áudio audível,
-  latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico,
-  `--no-animations`, `--color 256/16/never` e 24/16 bpp.
+  latência, CPU ocioso, restauração por `Q`/`Esc`/`Ctrl+C`/`SIGTERM`/`SIGHUP`/
+  pânico, `--no-animations`, `--color 256/16/never` e 24/16 bpp.
+- **Pendências de release:** MSRV 1.88 não instalada; 24/16 bpp não validados;
+  release público (P-07) não solicitado. Não criar tag/push sem pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;

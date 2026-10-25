@@ -14,7 +14,7 @@
 | 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25); VT pendente |
 | 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída (headless)**; VT pendente |
 | 4 — Acabamento | tema, som, a11y, desempenho | **concluída (headless)**; VT pendente |
-| 5 — Release v1.0 | validação em VT, pacote, docs | pacote + smoke test |
+| 5 — Release v1.0 | validação em VT, pacote, docs | **pacote local concluído**; detalhes VT/público pendentes |
 | 6 — Backlog | TUI, DRM/KMS, persistência | priorizado pelo usuário |
 
 ## Fase 0 — Descoberta (concluída)
@@ -180,7 +180,7 @@ Evidência headless: síntese testada sem hardware, backend ALSA com handshake e
 fallback silencioso, fade de 120 ms, contraste ≥ 4,5:1/10:1 e paletas
 douradas. Ver `docs/10-validation-log.md`.
 
-## Fase 5 — Release v1.0
+## Fase 5 — Release v1.0 (pacote local concluído em 2026-10-25)
 
 **Escopo:** congelar, validar, empacotar e documentar.
 
@@ -197,12 +197,17 @@ Tarefas:
 
 Critérios de saída:
 
-- [ ] `docs/09-release-checklist.md` completo ou pendências explícitas.
-- [ ] Pacote com binário, README, licenças, notices e créditos.
-- [ ] `.sha256` verificado.
-- [ ] Binário copiado sozinho funciona.
-- [ ] Nenhum terminal/console corrompido.
-- [ ] `AGENTS.md` com hash, data e pendências.
+- [x] `docs/09-release-checklist.md` com pendências explícitas.
+- [x] Pacote com binário, README, licenças, notices, notas e créditos.
+- [x] `.sha256` verificado.
+- [x] Binário copiado sozinho funciona (smoke em `/tmp` sem `assets/`).
+- [x] Nenhum terminal/console corrompido na execução inicial em VT; detalhes
+  de restauração por caminho seguem pendentes.
+- [x] `AGENTS.md` com hash do pacote, data e pendências.
+
+Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
+`63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`.
+Pendentes: detalhes manuais em VT, 24/16 bpp, MSRV 1.88, tag/release público.
 
 ## Fase 6 — Backlog
 

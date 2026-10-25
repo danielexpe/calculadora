@@ -151,6 +151,10 @@ Total: 1.387.923 bytes. Hashes completos em
 | 2026-10-25 | Síntese de áudio sem hardware | verde | durações 22/180 ms; pico ≤ VOLUME; determinística |
 | 2026-10-25 | Backend ALSA com fallback | verde | handshake < 400 ms; indisponível = silêncio |
 | 2026-10-25 | Contraste das 4 paletas | verde | primário ≥ 7:1; secundário/muted ≥ 4,5:1; acento ≥ 10:1 |
+| 2026-10-25 | Congelamento v1.0.0 e portões completos | verde | 194 ativos; builds release com/sem features |
+| 2026-10-25 | Pacote local + `.sha256` | verde | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
+| 2026-10-25 | Smoke do pacote em `/tmp` sem assets | verde | `--version`, captura 1344 × 756, PNG determinístico |
+| — | MSRV 1.88 | **PENDENTE** | apenas 1.99.1 instalado |
 | 2026-10-25 | Execução em `/dev/fb0` em VT | **OK (reportado pelo usuário)** | `amdgpudrmfb` 1920 × 1080 32 bpp; app iniciou e operou no VT |
 | — | 24 bpp / 16 bpp | **PENDENTE** | hardware/VM não confirmados |
 | — | Áudio real ouvido em VT | **PENDENTE** | backend implementado; confirmar clique/erro no teste detalhado |
@@ -230,6 +234,22 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
 - **Ainda não detalhado:** áudio audível, latência de tecla, CPU ocioso,
   restauração por cada caminho (`Q`/`Esc`/`Ctrl+C`/`SIGTERM`/pânico),
   `SIGHUP`, 24/16 bpp e resoluções alternativas. Não tratar como validados.
+
+## 3.5 Evidência da Fase 5 (pacote local)
+
+- Versão congelada em `1.0.0` (`Cargo.toml`/`Cargo.lock`); todos os portões
+  verdes com e sem features.
+- Pacote `dist/calculadora-1.0.0-linux-x86_64.tar.gz` com binário, README,
+  `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `RELEASE_NOTES.md` e
+  textos OFL em `licenses/`; sem `assets/`.
+- SHA-256:
+  `63f562d14ac790a921115b8150edee2c45a2c1efc6fea85f9addd9865556a023`
+  (verificado com `sha256sum -c`).
+- Smoke em `/tmp`: `--version` → `calculadora 1.0.0`; captura 1344 × 756
+  determinística; binário roda fora da pasta do projeto.
+- Sem tag, push ou release público (P-07 não solicitado).
+- **Pendentes:** itens manuais detalhados da Fase 5, 24/16 bpp, MSRV 1.88 e
+  decisão sobre release público.
 
 ## 4. Bloqueios ativos
 
@@ -320,6 +340,7 @@ Seguir `docs/05-test-plan.md`, seção 9. Registrar cada item como
 | CPU ocioso | < 2% | — | — |
 | Binário release | < 15 MB | 3,6 MB (Fase 4) | 2026-10-25 |
 | Assets | < 4 MB | 1.387.923 B (1,39 MB) | 2026-10-25 |
+| Pacote local | — | 1,6 MB (`tar.gz`) | 2026-10-25 |
 | Handshake de áudio | não bloquear o loop | < 400 ms (teste; sem dispositivo = silêncio) | 2026-10-25 |
 | Latência de tecla | < 50 ms | — (requer VT) | — |
 | Captura | < 1 s | ~40 ms (release, headless) | 2026-10-25 |
@@ -339,3 +360,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Fase 3: fluxo Input→App→cena, histórico com rolagem/recall, flash/debounce, marcador de som, 16 capturas douradas, PTY e teste de sinal; 182 testes ativos + 2 auxiliares |
 | 2026-10-25 | Fase 4: áudio ALSA dinâmico + síntese, fade de histórico, contraste/paletas, compositor com fundo em cache, capturas regeneradas; 194 testes ativos + 2 auxiliares |
 | 2026-10-25 | Validação inicial em VT reportada OK pelo usuário |
+| 2026-10-25 | Fase 5: versão 1.0.0, checklist, RELEASE_NOTES, pacote + sha256, smoke em /tmp |
