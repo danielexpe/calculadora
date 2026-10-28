@@ -287,7 +287,8 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   (verificado com `sha256sum -c`).
 - `install.sh --check` no pacote extraído; instalação em prefixo temporário com
   `--skip-fb`, verificação de versão, captura 1344 × 756 e `--uninstall`.
-- Tag `v1.0.1` e GitHub release publicados após o push de `main`.
+- Commit `7f2fd6b`, push de `main`, tag `v1.0.1` e GitHub release publicados;
+  assets baixados de volta e `.sha256` verificado.
 - **Pendente:** confirmar o fix de `yoffset`/double buffer no segundo
   computador e anexar a saída de `fbset -i`.
 
@@ -406,4 +407,4 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | GitHub release `v1.0.0` com pacote + sha256 | https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
 | 2026-10-25 | README reescrito e pacote 1.0.0 regenerado para atualizar a release | novo hash `62829f59…` |
 | 2026-10-28 | Corrigido framebuffer em hardware com `yoffset`/double buffer: pan via `FBIOPAN_DISPLAY` e fallback direto; 182 testes | aguarda teste no segundo computador |
-| 2026-10-28 | Release 1.0.1: fix de `yoffset`/double buffer e `install.sh`; pacote verificado | `dist/calculadora-1.0.1-linux-x86_64.tar.gz`, SHA-256 `5f450f35…` |
+| 2026-10-28 | Release 1.0.1: fix de `yoffset`/double buffer e `install.sh`; pacote verificado | [v1.0.1](https://github.com/danielexpe/calculadora/releases/tag/v1.0.1), commit `7f2fd6b`, SHA-256 `5f450f35…` |

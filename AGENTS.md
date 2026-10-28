@@ -228,6 +228,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | README reescrito para usuários e desenvolvedores; pacote regenerado (hash `62829f59…`) | `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | `6d32d1c` |
 | 2026-10-25 | Assets da release `v1.0.0` substituídos pelo pacote/README atualizados; download e sha256 verificados | `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, `...sha256`, `AGENTS.md` | n/a (registro) |
 | 2026-10-28 | fbdev: respeitar `yoffset`, double buffer com `FBIOPAN_DISPLAY` e fallback de escrita direta; corrige tela invisível no segundo computador; 182 unitários | `src/platform/fb.rs`, `docs/10-validation-log.md`, `AGENTS.md` | sem commit |
+| 2026-10-28 | Release 1.0.1 com fix de fb e `install.sh` (sudo interativo/grupo video); pacote verificado por download; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `user_run_now.sh` | `7f2fd6b` / `v1.0.1` |
 
 ## 11. Fases
 
