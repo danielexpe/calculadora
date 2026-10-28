@@ -86,6 +86,10 @@ printf 'resolução virtual: '
 cat /sys/class/graphics/fb0/virtual_size 2>/dev/null || printf 'desconhecida\n'
 printf 'bpp: '
 cat /sys/class/graphics/fb0/bits_per_pixel 2>/dev/null || printf 'desconhecido\n'
+if command -v fbset >/dev/null 2>&1; then
+    printf '\n'
+    fbset -i 2>/dev/null || printf 'fbset -i indisponível\n'
+fi
 
 if [ "$BUILD" -eq 1 ]; then
     step "Build release com áudio"

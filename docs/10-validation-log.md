@@ -256,6 +256,41 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
 - **Pendentes:** itens manuais detalhados da Fase 5, 24/16 bpp, MSRV 1.88 e
   decisão sobre release público.
 
+## 3.6 Incidente de framebuffer em segundo computador — PENDENTE
+
+- Relato: na release `v1.0.0`, em outro computador com Zorin OS na mesma
+  versão, a tela da aplicação não aparecia no VT (`Ctrl+Alt+F3`); após
+  `Ctrl+C`, a tela aparecia por breves instantes antes da restauração do
+  console.
+- Causa provável: o backend escrevia sempre no início do mmap e nunca
+  considerava `fb_var_screeninfo.yoffset`; com double buffer, o console pode
+  deixar visível o segundo buffer. A imagem desenhada só era exibida quando a
+  restauração do console forçava a troca de buffer.
+- Correção aplicada (2026-10-28): double buffer com `FBIOPAN_DISPLAY` quando
+  `ypanstep > 0`, `yres_virtual >= 2*yres`, alinhamento e `smem_len` suficientes;
+  sem ypan, escrita direta no buffer visível (`yoffset` atual); fallback para
+  escrita direta se o pan falhar.
+- Testes: portões completos verdes com e sem features (182 unitários, 9 de
+  processo, douradas, PTY, sinais e xtask).
+- **Pendente:** reproduzir no segundo computador e registrar driver, resolução,
+  `virtual_size`, bpp e `fbset -i` (incluindo `yoffset`/`ypanstep`).
+
+## 3.7 Evidência da release 1.0.1 — 2026-10-28
+
+- Versão 1.0.1 em `Cargo.toml`/`Cargo.lock`; portões completos verdes com e
+  sem features (182 unitários; 195 ativos no total).
+- Pacote `dist/calculadora-1.0.1-linux-x86_64.tar.gz` com binário, `install.sh`,
+  README, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `RELEASE_NOTES.md`
+  e textos OFL em `licenses/`; sem `assets/`.
+- SHA-256:
+  `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`
+  (verificado com `sha256sum -c`).
+- `install.sh --check` no pacote extraído; instalação em prefixo temporário com
+  `--skip-fb`, verificação de versão, captura 1344 × 756 e `--uninstall`.
+- Tag `v1.0.1` e GitHub release publicados após o push de `main`.
+- **Pendente:** confirmar o fix de `yoffset`/double buffer no segundo
+  computador e anexar a saída de `fbset -i`.
+
 ## 4. Bloqueios ativos
 
 | ID | Bloqueio | O que falta | Dono |
@@ -370,3 +405,5 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | Repositório público criado e `main` publicado | https://github.com/danielexpe/calculadora |
 | 2026-10-25 | GitHub release `v1.0.0` com pacote + sha256 | https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
 | 2026-10-25 | README reescrito e pacote 1.0.0 regenerado para atualizar a release | novo hash `62829f59…` |
+| 2026-10-28 | Corrigido framebuffer em hardware com `yoffset`/double buffer: pan via `FBIOPAN_DISPLAY` e fallback direto; 182 testes | aguarda teste no segundo computador |
+| 2026-10-28 | Release 1.0.1: fix de `yoffset`/double buffer e `install.sh`; pacote verificado | `dist/calculadora-1.0.1-linux-x86_64.tar.gz`, SHA-256 `5f450f35…` |

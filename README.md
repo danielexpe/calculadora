@@ -8,7 +8,7 @@ gráfico. Interface escura, tipografia cuidada, fita de histórico e suporte a
 português e inglês.
 
 - Repositório: https://github.com/danielexpe/calculadora
-- Release 1.0.0: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+- Release 1.0.1: https://github.com/danielexpe/calculadora/releases/tag/v1.0.1
 - Licença do código: MIT
 
 ## Sumário
@@ -72,34 +72,35 @@ permissões.
 
 ### Baixar e instalar
 
-Baixe o pacote e o checksum da release `v1.0.0`:
+Baixe o pacote e o checksum da release `v1.0.1`:
 
 ```bash
-mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
 cd /tmp
 
 curl -fLO \
-  https://github.com/danielexpe/calculadora/releases/download/v1.0.0/calculadora-1.0.0-linux-x86_64.tar.gz
+  https://github.com/danielexpe/calculadora/releases/download/v1.0.1/calculadora-1.0.1-linux-x86_64.tar.gz
 curl -fLO \
-  https://github.com/danielexpe/calculadora/releases/download/v1.0.0/calculadora-1.0.0-linux-x86_64.tar.gz.sha256
+  https://github.com/danielexpe/calculadora/releases/download/v1.0.1/calculadora-1.0.1-linux-x86_64.tar.gz.sha256
 
-sha256sum -c calculadora-1.0.0-linux-x86_64.tar.gz.sha256
+sha256sum -c calculadora-1.0.1-linux-x86_64.tar.gz.sha256
 ```
 
 O checksum detecta download corrompido; ele não substitui uma assinatura
-criptográfica. Depois extraia e instale:
+criptográfica. Depois extraia e execute o instalador:
 
 ```bash
-tar -xzf calculadora-1.0.0-linux-x86_64.tar.gz -C "$HOME/.local/opt"
-
-ln -sfn \
-  "$HOME/.local/opt/calculadora-1.0.0-linux-x86_64/calculadora" \
-  "$HOME/.local/bin/calculadora"
-
-"$HOME/.local/bin/calculadora" --version
+tar -xzf calculadora-1.0.1-linux-x86_64.tar.gz
+cd calculadora-1.0.1-linux-x86_64
+./install.sh
 ```
 
-Saída esperada: `calculadora 1.0.0`.
+O instalador copia o binário para `$HOME/.local/bin/calculadora`, instala a
+documentação em `$HOME/.local/share/doc/calculadora` e, se necessário, pede a
+senha de `sudo` para adicionar seu usuário ao grupo `video`. Use `--prefix DIR`
+para escolher outro destino, `--check` para só validar o pacote e `--skip-fb`
+para não mexer em permissões.
+
+Saída esperada: `calculadora 1.0.1`.
 
 Se `$HOME/.local/bin` não estiver no `PATH`, use o caminho completo
 `"$HOME/.local/bin/calculadora"` ou adicione a pasta ao `PATH` no seu shell.
@@ -107,6 +108,7 @@ Se `$HOME/.local/bin` não estiver no `PATH`, use o caminho completo
 O pacote contém:
 
 - `calculadora` — executável;
+- `install.sh` — instalador e desinstalador;
 - `README.md`, `RELEASE_NOTES.md`;
 - `LICENSE`, `LICENSE-ART`;
 - `THIRD_PARTY_NOTICES.md`;
@@ -116,8 +118,9 @@ O diretório `assets/` do código-fonte **não** é necessário para executar.
 
 ### Liberar acesso ao framebuffer
 
-A permissão típica é `root:video` com modo `660`. Adicione seu usuário ao grupo
-`video`:
+A permissão típica é `root:video` com modo `660`. O `install.sh` detecta a
+falta de acesso e pede a senha de `sudo` para adicionar seu usuário ao grupo
+`video`. Para fazer manualmente:
 
 ```bash
 sudo usermod -aG video "$USER"
@@ -263,14 +266,20 @@ Fedora/Arch) e garanta um dispositivo de saída configurado.
 
 ### Atualizar e desinstalar
 
-Para atualizar, baixe a nova release, confira o `.sha256`, extraia em
-`$HOME/.local/opt` e atualize o symlink `$HOME/.local/bin/calculadora`.
+Para atualizar, baixe a nova release, confira o `.sha256`, extraia e execute
+`./install.sh` novamente; o instalador substitui o binário e a documentação.
 
 Para desinstalar:
 
 ```bash
+./install.sh --uninstall
+```
+
+Ou, manualmente:
+
+```bash
 rm -f "$HOME/.local/bin/calculadora"
-rm -rf "$HOME/.local/opt/calculadora-1.0.0-linux-x86_64"
+rm -rf "$HOME/.local/share/doc/calculadora"
 ```
 
 Remova também o usuário do grupo `video` se ele não for mais necessário:
@@ -461,23 +470,24 @@ xtask/                    manifesto/verificação de assets
 
 ### Empacotamento
 
-A release oficial é montada a partir do binário release, README, licenças,
-notices, notas e textos OFL. O processo completo e o checklist estão em
-`docs/09-release-checklist.md`. Resumo:
+A release oficial é montada a partir do binário release, instalador, README,
+licenças, notices, notas e textos OFL. O processo completo e o checklist estão
+em `docs/09-release-checklist.md`. Resumo:
 
 ```bash
 cargo build --release
-mkdir -p dist/calculadora-1.0.0-linux-x86_64/licenses
-cp target/release/calculadora dist/calculadora-1.0.0-linux-x86_64/
+mkdir -p dist/calculadora-1.0.1-linux-x86_64/licenses
+cp target/release/calculadora install.sh dist/calculadora-1.0.1-linux-x86_64/
 cp README.md RELEASE_NOTES.md LICENSE LICENSE-ART THIRD_PARTY_NOTICES.md \
-  dist/calculadora-1.0.0-linux-x86_64/
+  dist/calculadora-1.0.1-linux-x86_64/
 cp assets/fonts/OFL-Inter.txt assets/fonts/OFL-JetBrainsMono.txt \
-  dist/calculadora-1.0.0-linux-x86_64/licenses/
+  dist/calculadora-1.0.1-linux-x86_64/licenses/
+chmod +x dist/calculadora-1.0.1-linux-x86_64/install.sh
 
-tar -czf dist/calculadora-1.0.0-linux-x86_64.tar.gz \
-  -C dist calculadora-1.0.0-linux-x86_64
-(cd dist && sha256sum calculadora-1.0.0-linux-x86_64.tar.gz \
-  > calculadora-1.0.0-linux-x86_64.tar.gz.sha256)
+tar -czf dist/calculadora-1.0.1-linux-x86_64.tar.gz \
+  -C dist calculadora-1.0.1-linux-x86_64
+(cd dist && sha256sum calculadora-1.0.1-linux-x86_64.tar.gz \
+  > calculadora-1.0.1-linux-x86_64.tar.gz.sha256)
 ```
 
 Antes de publicar, teste o binário extraído em `/tmp` sem `assets/` e valide o
@@ -501,8 +511,10 @@ Issues e pull requests: https://github.com/danielexpe/calculadora
 
 ## Estado, limitações e licenças
 
-**Versão 1.0.0 (2026-10-25).** Fluxo, áudio, histórico, fade, paletas e saída
+**Versão 1.0.1 (2026-10-28).** Fluxo, áudio, histórico, fade, paletas e saída
 foram validados manualmente em VT no alvo `amdgpudrmfb` 1920 × 1080 32 bpp.
+A 1.0.1 corrige telas invisíveis em framebuffers com double buffer/`yoffset` e
+adiciona o instalador automático.
 
 Limitações conhecidas:
 

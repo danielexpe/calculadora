@@ -2,7 +2,7 @@
 
 > Projeto: **Calculadora** — calculadora decimal para console Linux, renderizada
 > em `/dev/fb0`. Este arquivo é a primeira leitura de qualquer agente.
-> Última atualização: **2026-10-25**.
+> Última atualização: **2026-10-28**.
 
 ## 1. Retomada rápida
 
@@ -22,22 +22,22 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–5 implementadas; release 1.0.0 público |
+| Código de produção | Fases 1–5 implementadas; release 1.0.1 público |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
 | Fase 2 — Substrato fb | **concluída** (2026-10-25); VT validado |
-| Testes | 194 ativos verdes (181 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
+| Testes | 195 ativos verdes (182 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
 | Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
 | Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT validado |
 | Fase 4 — Acabamento | **concluída** (2026-10-25); teste manual completo em VT OK |
-| Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.0 |
-| Versão | **1.0.0** |
-| Pacote local | `dist/calculadora-1.0.0-linux-x86_64.tar.gz` |
-| SHA-256 do pacote | `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc` |
-| Validação em hardware | **teste manual completo OK** (2026-10-25); 24/16 e sinais/pânico pendentes |
+| Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.1 |
+| Versão | **1.0.1** |
+| Pacote local | `dist/calculadora-1.0.1-linux-x86_64.tar.gz` |
+| SHA-256 do pacote | `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f` |
+| Validação em hardware | **teste manual completo OK** (2026-10-25); fix fb no 2º PC, 24/16 e sinais/pânico pendentes |
 | Repositório git | `main` local; remoto público `origin` (GitHub) |
 | Repositório remoto | https://github.com/danielexpe/calculadora |
-| GitHub release | `v1.0.0` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.0 |
-| Commits/releases | `main` publicado; tag `v1.0.0` e GitHub release com `tar.gz` + `.sha256` |
+| GitHub release | `v1.0.1` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.1 |
+| Commits/releases | `main` publicado; tag `v1.0.1` e GitHub release com `tar.gz`, `.sha256` e `install.sh` no pacote |
 | Escopo | **encerrado na Fase 5**; sem Fase 6/backlog (D-020) |
 
 ## 3. Resumo do produto
@@ -102,6 +102,9 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 Nenhuma pendência bloqueante. O escopo foi encerrado na Fase 5 (D-020). Itens
 técnicos opcionais, já registrados como pendentes no release:
 
+- Confirmar em hardware o fix de `yoffset`/double buffer (2026-10-28) que
+  corrige a tela invisível até `Ctrl+C` no segundo computador; registrar driver,
+  `virtual_size`, bpp e `fbset -i`.
 - 24/16 bpp e resoluções alternativas (sem hardware/VM).
 - `SIGTERM`/`SIGHUP`/pânico observados no console.
 - Medições formais de CPU ocioso/frame ocioso/latência.
@@ -224,6 +227,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Housekeeping: Fase 6/backlog removidos (D-020), status final e pendências opcionais | `AGENTS.md`, `docs/01-calculadora.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` | `6cdc306` |
 | 2026-10-25 | README reescrito para usuários e desenvolvedores; pacote regenerado (hash `62829f59…`) | `README.md`, `docs/06-roadmap.md`, `docs/09-release-checklist.md`, `docs/10-validation-log.md`, `AGENTS.md` | `6d32d1c` |
 | 2026-10-25 | Assets da release `v1.0.0` substituídos pelo pacote/README atualizados; download e sha256 verificados | `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, `...sha256`, `AGENTS.md` | n/a (registro) |
+| 2026-10-28 | fbdev: respeitar `yoffset`, double buffer com `FBIOPAN_DISPLAY` e fallback de escrita direta; corrige tela invisível no segundo computador; 182 unitários | `src/platform/fb.rs`, `docs/10-validation-log.md`, `AGENTS.md` | sem commit |
 
 ## 11. Fases
 
@@ -234,21 +238,22 @@ Não registrar segredos. Não inventar progresso.
 | 2 | fbdev, console, texto, cena, captura | **concluída** |
 | 3 | fluxo completo, histórico, capturas douradas | **concluída** |
 | 4 | tema, som, a11y, desempenho | **concluída** |
-| 5 | validação em VT, pacote, docs | **concluída**; release público v1.0.0 |
+| 5 | validação em VT, pacote, docs | **concluída**; release público v1.0.1 |
 
 O escopo termina na Fase 5; não há Fase 6 nem backlog planejado (D-020).
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1–5 estão concluídas; o pacote v1.0.0 foi gerado/testado em `/tmp`
-  e o teste manual completo em VT foi reportado **OK**. O repositório público
-  `https://github.com/danielexpe/calculadora` foi criado com `main` enviado, e
-  a release `v1.0.0` foi publicada com `tar.gz` + `.sha256`.
+- As Fases 1–5 estão concluídas; o pacote v1.0.1 foi gerado/testado em `/tmp`
+  e o teste manual completo em VT foi reportado **OK** na 1.0.0. A release
+  `v1.0.1` inclui a correção de `yoffset`/double buffer e o `install.sh`.
+- **Pendência de hardware:** confirmar a correção do framebuffer no segundo
+  computador; anexar driver, `virtual_size`, bpp e `fbset -i`.
 - **Não há próxima fase planejada.** O escopo foi encerrado na Fase 5 (D-020);
   apenas validações técnicas opcionais permanecem.
 - **Validações opcionais:** MSRV 1.88; 24/16 bpp/resoluções alternativas;
   `SIGTERM`/`SIGHUP`/pânico observados no console; medições de CPU/latência.
-  O release público `v1.0.0` já existe; novas tags só com pedido.
+  O release público `v1.0.1` já existe; novas tags só com pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;
@@ -257,4 +262,4 @@ O escopo termina na Fase 5; não há Fase 6 nem backlog planejado (D-020).
   houver hardware. Nada de declarar validação sem executar.
 - Qualquer mudança de comportamento deve atualizar `docs/01`, `docs/05` e as
   capturas correspondentes.
-- Não publicar release, criar commit/push ou tag sem pedido.
+- Não publicar release, criar commit/push ou tag sem pedido explícito.

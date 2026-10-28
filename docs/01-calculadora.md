@@ -343,7 +343,7 @@ Estados:
 
 ## 12. Escopo encerrado
 
-A v1.0.0 encerra o escopo: não há Fase 6 nem backlog planejado (D-020). Os
+A v1.0 encerra o escopo: não há Fase 6 nem backlog planejado (D-020). Os
 itens abaixo permanecem fora do produto:
 
 1. Backend TUI (`ratatui`) para SSH/desenvolvimento.

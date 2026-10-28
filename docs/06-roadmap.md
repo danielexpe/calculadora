@@ -14,7 +14,7 @@
 | 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25) |
 | 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída** (2026-10-25) |
 | 4 — Acabamento | tema, som, a11y, desempenho | **concluída** (2026-10-25) |
-| 5 — Release v1.0 | validação em VT, pacote, docs | **concluída** (2026-10-25); release público v1.0.0 |
+| 5 — Release v1.0 | validação em VT, pacote, docs | **concluída** (2026-10-25); release público v1.0.1 |
 
 ## Fase 0 — Descoberta (concluída)
 
@@ -204,11 +204,13 @@ Critérios de saída:
   (`Q`/`Esc`/`Ctrl+C`); `SIGHUP`/pânico seguem pendentes.
 - [x] `AGENTS.md` com hash do pacote, data e pendências.
 
-Pacote: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, SHA-256
-`62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`.
-Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+Pacote: `dist/calculadora-1.0.1-linux-x86_64.tar.gz`, SHA-256
+`5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`.
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.1
 
-Pendentes: 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
+A 1.0.1 (2026-10-28) corrige framebuffer com `yoffset`/double buffer e
+adiciona `install.sh` ao pacote. Pendentes: confirmação do fix no segundo
+computador, 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
 formais de CPU/latência e MSRV 1.88.
 
 ## Dependências entre fases

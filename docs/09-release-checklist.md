@@ -1,4 +1,4 @@
-# 09 — Checklist de release v1.0
+# 09 — Checklist de release v1.0.1
 
 > Não marcar itens sem execução real. Itens de hardware não validados ficam
 > como **pendentes** com a causa registrada em `docs/10-validation-log.md`.
@@ -7,10 +7,10 @@
 
 Repositório público: https://github.com/danielexpe/calculadora
 
-Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.0
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.1
 
-Pacote local: `dist/calculadora-1.0.0-linux-x86_64.tar.gz`
-Hash SHA-256: `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`
+Pacote local: `dist/calculadora-1.0.1-linux-x86_64.tar.gz`
+Hash SHA-256: `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`
 
 ## Funcional
 
@@ -31,7 +31,7 @@ Hash SHA-256: `62829f591548d8d6703687ee0312ab073f5b85ec3ef6dd3d1a145cc0c01803fc`
 - [x] `cargo fmt --all -- --check`.
 - [x] `cargo clippy --workspace --all-targets -- -D warnings`.
 - [x] `cargo clippy --workspace --all-targets --no-default-features -- -D warnings`.
-- [x] `cargo test --workspace` (194 ativos verdes; 2 auxiliares ignorados).
+- [x] `cargo test --workspace` (195 ativos verdes; 2 auxiliares ignorados).
 - [x] `cargo test --workspace --no-default-features`.
 - [x] `cargo xtask assets --check`.
 - [x] `cargo build --release`.
@@ -85,17 +85,21 @@ explicitamente pendentes abaixo.
 
 ## Release
 
-- [x] Escopo congelado; versão 1.0.0 em `Cargo.toml` e `Cargo.lock`.
+- [x] Escopo congelado; versão 1.0.1 em `Cargo.toml` e `Cargo.lock`.
 - [x] `README.md` atualizado e sem drift.
 - [x] `LICENSE` (MIT) e `LICENSE-ART` (CC BY 4.0) no pacote.
 - [x] Textos OFL das duas fontes no pacote (`licenses/`).
 - [x] `THIRD_PARTY_NOTICES.md` no pacote.
 - [x] `RELEASE_NOTES.md` sem hash do próprio pacote.
-- [x] Pacote com binário, README, licenças, notices e créditos.
+- [x] Pacote com binário, `install.sh`, README, licenças, notices e créditos.
 - [x] `tar.gz` + `.sha256` gerados.
 - [x] `.sha256` verificado no diretório do pacote.
 - [x] Smoke test em `/tmp` sem `assets/`.
-- [x] Tag `v1.0.0` e GitHub release público com `tar.gz` + `.sha256`.
+- [x] `install.sh` testado em `/tmp` com prefixo temporário (`--skip-fb`),
+  incluindo `--check`, instalação, captura e `--uninstall`.
+- [ ] Fix de `yoffset`/double buffer confirmado no segundo computador —
+  **pendente**. Registro em `docs/10-validation-log.md` §3.6.
+- [x] Tag `v1.0.1` e GitHub release público com `tar.gz` + `.sha256`.
 - [x] Hash e caminho registrados no `AGENTS.md`.
 
 ## Bloqueios conhecidos (2026-10-25)
@@ -105,13 +109,13 @@ explicitamente pendentes abaixo.
 - [x] P-03: resolvido; `rust_decimal` 1.43.0 pinada/testada.
 - [x] P-04: resolvido; fontes OFL baixadas e verificadas.
 - [ ] P-06: 24/16 bpp não confirmados — **pendente**.
-- [x] P-07: repositório público, tag `v1.0.0` e GitHub release publicados.
+- [x] P-07: repositório público, tag `v1.0.1` e GitHub release publicados.
 - [ ] MSRV 1.88 não instalada no ambiente.
 
 ## Critério de release
 
-O pacote v1.0.0 está gerado, verificado e testado isoladamente em `/tmp`; o
-teste manual completo em VT foi reportado OK; tag e GitHub release públicos
-foram publicados com os dois artefatos. 24/16 bpp, resoluções alternativas,
+O pacote v1.0.1 está gerado, verificado e testado isoladamente em `/tmp`;
+o instalador foi exercitado com prefixo temporário; tag e GitHub release
+públicos foram publicados com os dois artefatos. 24/16 bpp, resoluções alternativas,
 `SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88 permanecem
 explicitamente pendentes.

@@ -305,10 +305,12 @@ pub struct FbInfo {
 }
 
 pub struct Framebuffer {
-    _fd: OwnedFd,
+    fd: OwnedFd,
+    path: PathBuf,
     map: *mut u8,
     map_len: usize,
     info: FbInfo,
+    current_offset: u32,
 }
 
 impl Framebuffer {
@@ -367,14 +369,40 @@ impl Framebuffer {
                 "line_length is smaller than xres * bytes_per_pixel",
             ));
         }
-        if fix.smem_len < fix.line_length * var.yres {
+        if var.yoffset > var.yres_virtual - var.yres {
+            return Err(FbError::Invalid(
+                "yoffset does not leave room for the visible frame",
+            ));
+        }
+
+        let stride = fix.line_length as usize;
+        let visible_frame = stride * var.yres as usize;
+        if (fix.smem_len as usize) < visible_frame {
             return Err(FbError::Invalid(
                 "smem_len is smaller than the visible frame",
             ));
         }
 
-        let map_len = fix.line_length as usize * var.yres as usize;
-        // SAFETY: map_len covers the visible frame, fd is valid and MAP_SHARED is required by fbdev.
+        let double_buffer = stride * 2 * var.yres as usize;
+        let ypan_supported = fix.ypanstep > 0
+            && var.yres_virtual >= 2 * var.yres
+            && var.yres % u32::from(fix.ypanstep) == 0
+            && (fix.smem_len as usize) >= double_buffer;
+
+        let map_rows = if ypan_supported {
+            2 * var.yres
+        } else {
+            var.yoffset + var.yres
+        };
+        let map_len = stride * map_rows as usize;
+        if map_len > fix.smem_len as usize {
+            return Err(FbError::Invalid(
+                "smem_len is smaller than the mapped frame",
+            ));
+        }
+
+        // SAFETY: map_len covers every buffer this framebuffer may write, fd is valid and
+        // MAP_SHARED is required by fbdev.
         let map = unsafe {
             libc::mmap(
                 std::ptr::null_mut(),
@@ -389,12 +417,9 @@ impl Framebuffer {
             return Err(FbError::Map(io::Error::last_os_error()));
         }
 
-        let ypan_supported = fix.ypanstep > 0
-            && var.yres_virtual >= 2 * var.yres
-            && var.yres % u32::from(fix.ypanstep) == 0;
-
         Ok(Self {
-            _fd: fd,
+            fd,
+            path,
             map: map.cast(),
             map_len,
             info: FbInfo {
@@ -405,6 +430,7 @@ impl Framebuffer {
                 ypan_supported,
                 format,
             },
+            current_offset: var.yoffset,
         })
     }
 
@@ -413,6 +439,25 @@ impl Framebuffer {
     }
 
     pub fn present(&mut self, rgba: &[u8]) -> Result<(), FbError> {
+        if self.info.ypan_supported {
+            let target = pan_target(self.current_offset, self.info.height);
+            self.write_frame(rgba, target)?;
+            match self.pan(target) {
+                Ok(()) => {
+                    self.current_offset = target;
+                    return Ok(());
+                }
+                Err(_) => {
+                    self.info.ypan_supported = false;
+                }
+            }
+        }
+
+        self.write_frame(rgba, self.current_offset)
+    }
+
+    fn write_frame(&mut self, rgba: &[u8], row_offset: u32) -> Result<(), FbError> {
+        let base = self.info.line_length as usize * row_offset as usize;
         // SAFETY: the mapping is live for self, spans map_len bytes and is exclusively borrowed.
         let output = unsafe { std::slice::from_raw_parts_mut(self.map, self.map_len) };
         write_pixels(
@@ -421,8 +466,33 @@ impl Framebuffer {
             self.info.width,
             self.info.height,
             rgba,
-            output,
+            &mut output[base..],
         )
+    }
+
+    fn pan(&mut self, yoffset: u32) -> Result<(), FbError> {
+        let mut var = FbVarScreeninfo::zeroed();
+        ioctl_mut(self.fd.as_raw_fd(), FBIOGET_VSCREENINFO, &mut var).map_err(|source| {
+            FbError::Ioctl {
+                request: "FBIOGET_VSCREENINFO",
+                path: self.path.clone(),
+                source,
+            }
+        })?;
+        var.yoffset = yoffset;
+        ioctl_mut(self.fd.as_raw_fd(), FBIOPAN_DISPLAY, &mut var).map_err(|source| FbError::Ioctl {
+            request: "FBIOPAN_DISPLAY",
+            path: self.path.clone(),
+            source,
+        })
+    }
+}
+
+fn pan_target(current_offset: u32, height: u32) -> u32 {
+    if current_offset == 0 {
+        height
+    } else {
+        0
     }
 }
 
@@ -710,6 +780,13 @@ mod tests {
             blue_len: 8,
         };
         assert!(unsupported.to_string().contains("expected"));
+    }
+
+    #[test]
+    fn chooses_the_buffer_that_is_not_visible() {
+        assert_eq!(pan_target(0, 1080), 1080);
+        assert_eq!(pan_target(1080, 1080), 0);
+        assert_eq!(pan_target(360, 1080), 0);
     }
 
     #[test]
