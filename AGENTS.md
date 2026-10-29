@@ -9,7 +9,7 @@
 1. Ler este arquivo inteiro.
 2. Ler `framework.md` (template obrigatório) e os docs relevantes em `docs/`.
 3. Verificar `git status` — repositório local em `main`; último commit de
-   feature `2773796`, remoto público `origin`. Não criar tag ou release sem
+   feature `7a34397`, remoto público `origin`. Não criar tag ou release sem
    pedido explícito.
 4. Conferir `docs/10-validation-log.md` antes de declarar qualquer validação.
 5. Não iniciar fase sem pedido explícito; as Fases 0–5 estão concluídas no
@@ -231,7 +231,7 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-28 | fbdev: respeitar `yoffset`, double buffer com `FBIOPAN_DISPLAY` e fallback de escrita direta; corrige tela invisível no segundo computador; 182 unitários | `src/platform/fb.rs`, `docs/10-validation-log.md`, `AGENTS.md` | sem commit |
 | 2026-10-28 | Release 1.0.1 com fix de fb e `install.sh` (sudo interativo/grupo video); pacote verificado por download; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `user_run_now.sh` | `7f2fd6b` / `v1.0.1` |
 | 2026-10-28 | Correção de blank/DPMS: `FBIOBLANK`/`FB_BLANK_UNBLANK` após `KD_GRAPHICS`; fallback de pan mapeia também o buffer visível; 183 unitários + integração verdes | `src/platform/fb.rs`, `src/app.rs`, `AGENTS.md`, `docs/10-validation-log.md` | sem commit |
-| 2026-10-28 | Release 1.0.2: blank/DPMS, fallback de pan, versão 1.0.2, snapshots/portões, pacote e instalador verificados; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `src/app.rs` | `v1.0.2`, SHA-256 `59ecbc55…` |
+| 2026-10-28 | Release 1.0.2: blank/DPMS, fallback de pan, versão 1.0.2, snapshots/portões, pacote e instalador verificados; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `src/app.rs` | `7a34397` / `v1.0.2`, SHA-256 `59ecbc55…` |
 
 ## 11. Fases
 

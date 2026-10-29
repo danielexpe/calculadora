@@ -308,6 +308,8 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
   (verificado com `sha256sum -c`).
 - `install.sh --check`; instalação em prefixo temporário com `--skip-fb`,
   verificação de versão, captura 1344 × 756 e `--uninstall`.
+- Commit `7a34397`, push de `main`, tag `v1.0.2` e GitHub release publicados;
+  assets baixados de volta e `.sha256` verificado.
 - **Pendente:** confirmar no segundo computador que a primeira tela aparece sem
   `Ctrl+C` e que `/sys/class/graphics/fb0/blank` passa de `4` para `0`.
 - **Pendente:** 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico e medições
