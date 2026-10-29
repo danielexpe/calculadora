@@ -14,7 +14,7 @@
 | 2 — Substrato fb | fbdev, console, texto, cena, captura | **concluída** (2026-10-25) |
 | 3 — Fluxo funcional | UI completa, input loop, histórico | **concluída** (2026-10-25) |
 | 4 — Acabamento | tema, som, a11y, desempenho | **concluída** (2026-10-25) |
-| 5 — Release v1.0 | validação em VT, pacote, docs | **concluída** (2026-10-25); release público v1.0.1 |
+| 5 — Release v1.0 | validação em VT, pacote, docs | **concluída** (2026-10-25); release público v1.0.2 |
 
 ## Fase 0 — Descoberta (concluída)
 
@@ -204,14 +204,17 @@ Critérios de saída:
   (`Q`/`Esc`/`Ctrl+C`); `SIGHUP`/pânico seguem pendentes.
 - [x] `AGENTS.md` com hash do pacote, data e pendências.
 
-Pacote: `dist/calculadora-1.0.1-linux-x86_64.tar.gz`, SHA-256
-`5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`.
-Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.1
+Pacote: `dist/calculadora-1.0.2-linux-x86_64.tar.gz`, SHA-256
+`59ecbc55be2543c20c4a9fe6bd9fb4f9811fa385e3a40f7021e9bf436400cbc6`.
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.2
 
-A 1.0.1 (2026-10-28) corrige framebuffer com `yoffset`/double buffer e
-adiciona `install.sh` ao pacote. Pendentes: confirmação do fix no segundo
-computador, 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico, medições
-formais de CPU/latência e MSRV 1.88.
+A 1.0.2 (2026-10-28) desbloqueia o console com
+`FBIOBLANK`/`FB_BLANK_UNBLANK` após `KD_GRAPHICS`, corrigindo a tela que só
+aparecia ao `Ctrl+C` quando o VT chegava com `blank`/DPMS desligado. Também
+melhora o mapeamento do fallback de pan. A 1.0.1 já havia corrigido
+`yoffset`/double buffer e adicionado `install.sh`. Pendentes: confirmação no
+segundo computador, 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico,
+medições formais de CPU/latência e MSRV 1.88.
 
 ## Dependências entre fases
 

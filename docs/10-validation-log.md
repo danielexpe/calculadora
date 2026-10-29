@@ -292,6 +292,27 @@ sha256 67611a5c...74bb1f (idêntico em duas execuções)
 - **Pendente:** confirmar o fix de `yoffset`/double buffer no segundo
   computador e anexar a saída de `fbset -i`.
 
+## 3.8 Evidência da release 1.0.2 — 2026-10-28
+
+- Correção de blank/DPMS: `FBIOBLANK`/`FB_BLANK_UNBLANK` após
+  `KD_GRAPHICS`; falha no ioctl é não fatal.
+- Mapeamento do fallback de pan passa a cobrir o buffer visível mesmo quando o
+  driver tem mais de dois buffers virtuais.
+- Versão 1.0.2 em `Cargo.toml`/`Cargo.lock`; portões completos verdes com e sem
+  features (183 unitários; **196 ativos** no total).
+- Pacote `dist/calculadora-1.0.2-linux-x86_64.tar.gz` com binário, `install.sh`,
+  README, `LICENSE`, `LICENSE-ART`, `THIRD_PARTY_NOTICES.md`, `RELEASE_NOTES.md`
+  e textos OFL em `licenses/`; sem `assets/`.
+- SHA-256:
+  `59ecbc55be2543c20c4a9fe6bd9fb4f9811fa385e3a40f7021e9bf436400cbc6`
+  (verificado com `sha256sum -c`).
+- `install.sh --check`; instalação em prefixo temporário com `--skip-fb`,
+  verificação de versão, captura 1344 × 756 e `--uninstall`.
+- **Pendente:** confirmar no segundo computador que a primeira tela aparece sem
+  `Ctrl+C` e que `/sys/class/graphics/fb0/blank` passa de `4` para `0`.
+- **Pendente:** 24/16 bpp, resoluções alternativas, `SIGHUP`/pânico e medições
+  formais de CPU/latência.
+
 ## 4. Bloqueios ativos
 
 | ID | Bloqueio | O que falta | Dono |
@@ -408,3 +429,5 @@ Preencher apenas com medições reais em release.
 | 2026-10-25 | README reescrito e pacote 1.0.0 regenerado para atualizar a release | novo hash `62829f59…` |
 | 2026-10-28 | Corrigido framebuffer em hardware com `yoffset`/double buffer: pan via `FBIOPAN_DISPLAY` e fallback direto; 182 testes | aguarda teste no segundo computador |
 | 2026-10-28 | Release 1.0.1: fix de `yoffset`/double buffer e `install.sh`; pacote verificado | [v1.0.1](https://github.com/danielexpe/calculadora/releases/tag/v1.0.1), commit `7f2fd6b`, SHA-256 `5f450f35…` |
+| 2026-10-28 | Correção de blank/DPMS (`FBIOBLANK`/`FB_BLANK_UNBLANK` após `KD_GRAPHICS`) e mapeamento para fallback de pan; 196 ativos verdes | `src/platform/fb.rs`, `src/app.rs`, `AGENTS.md`, `docs/10-validation-log.md` |
+| 2026-10-28 | Release 1.0.2: blank/DPMS, fallback de pan, pacote e instalador verificado | `v1.0.2`, SHA-256 `59ecbc55…` |

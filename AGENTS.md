@@ -22,22 +22,22 @@
 | Fase 0 — Descoberta | **concluída** (2026-10-25) |
 | README + docs 01–10 | concluídos |
 | AGENTS.md | concluído |
-| Código de produção | Fases 1–5 implementadas; release 1.0.1 público |
+| Código de produção | Fases 1–5 implementadas; release 1.0.2 público |
 | Fase 1 — Fundação | **concluída** (2026-10-25) |
 | Fase 2 — Substrato fb | **concluída** (2026-10-25); VT validado |
-| Testes | 195 ativos verdes (182 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
+| Testes | 196 ativos verdes (183 unitários + 9 processo + 1 golden + 1 PTY + 1 sinais + 1 xtask); 2 auxiliares ignorados |
 | Captura PNG + douradas | **implementadas**: 1344 × 756; 16 snapshots; ~40 ms |
 | Fase 3 — Fluxo funcional | **concluída** (2026-10-25); VT validado |
 | Fase 4 — Acabamento | **concluída** (2026-10-25); teste manual completo em VT OK |
-| Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.1 |
-| Versão | **1.0.1** |
-| Pacote local | `dist/calculadora-1.0.1-linux-x86_64.tar.gz` |
-| SHA-256 do pacote | `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f` |
-| Validação em hardware | **teste manual completo OK** (2026-10-25); fix fb no 2º PC, 24/16 e sinais/pânico pendentes |
+| Fase 5 — Release | **concluída** (2026-10-25); release público v1.0.2 |
+| Versão | **1.0.2** |
+| Pacote local | `dist/calculadora-1.0.2-linux-x86_64.tar.gz` |
+| SHA-256 do pacote | `59ecbc55be2543c20c4a9fe6bd9fb4f9811fa385e3a40f7021e9bf436400cbc6` |
+| Validação em hardware | **teste manual completo OK** (2026-10-25); fix de blank/DPMS implementado em 2026-10-28 e pendente no 2º PC; 24/16 e sinais/pânico pendentes |
 | Repositório git | `main` local; remoto público `origin` (GitHub) |
 | Repositório remoto | https://github.com/danielexpe/calculadora |
-| GitHub release | `v1.0.1` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.1 |
-| Commits/releases | `main` publicado; tag `v1.0.1` e GitHub release com `tar.gz`, `.sha256` e `install.sh` no pacote |
+| GitHub release | `v1.0.2` — https://github.com/danielexpe/calculadora/releases/tag/v1.0.2 |
+| Commits/releases | `main` publicado; tag `v1.0.2` e GitHub release com `tar.gz`, `.sha256` e `install.sh` no pacote |
 | Escopo | **encerrado na Fase 5**; sem Fase 6/backlog (D-020) |
 
 ## 3. Resumo do produto
@@ -102,9 +102,10 @@ Em conflito: `docs/01` define comportamento; `docs/02` define arquitetura;
 Nenhuma pendência bloqueante. O escopo foi encerrado na Fase 5 (D-020). Itens
 técnicos opcionais, já registrados como pendentes no release:
 
-- Confirmar em hardware o fix de `yoffset`/double buffer (2026-10-28) que
-  corrige a tela invisível até `Ctrl+C` no segundo computador; registrar driver,
-  `virtual_size`, bpp e `fbset -i`.
+- Confirmar em hardware o fix de `yoffset`/double buffer (2026-10-28) e o
+  desbloqueio `FBIOBLANK`/`FB_BLANK_UNBLANK` (2026-10-28) que corrigem a tela
+  invisível até `Ctrl+C` no segundo computador; registrar driver,
+  `virtual_size`, bpp, `blank`, `yres_virtual`, `ypanstep` e `fbset -i`.
 - 24/16 bpp e resoluções alternativas (sem hardware/VM).
 - `SIGTERM`/`SIGHUP`/pânico observados no console.
 - Medições formais de CPU ocioso/frame ocioso/latência.
@@ -229,6 +230,8 @@ Não registrar segredos. Não inventar progresso.
 | 2026-10-25 | Assets da release `v1.0.0` substituídos pelo pacote/README atualizados; download e sha256 verificados | `dist/calculadora-1.0.0-linux-x86_64.tar.gz`, `...sha256`, `AGENTS.md` | n/a (registro) |
 | 2026-10-28 | fbdev: respeitar `yoffset`, double buffer com `FBIOPAN_DISPLAY` e fallback de escrita direta; corrige tela invisível no segundo computador; 182 unitários | `src/platform/fb.rs`, `docs/10-validation-log.md`, `AGENTS.md` | sem commit |
 | 2026-10-28 | Release 1.0.1 com fix de fb e `install.sh` (sudo interativo/grupo video); pacote verificado por download; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `user_run_now.sh` | `7f2fd6b` / `v1.0.1` |
+| 2026-10-28 | Correção de blank/DPMS: `FBIOBLANK`/`FB_BLANK_UNBLANK` após `KD_GRAPHICS`; fallback de pan mapeia também o buffer visível; 183 unitários + integração verdes | `src/platform/fb.rs`, `src/app.rs`, `AGENTS.md`, `docs/10-validation-log.md` | sem commit |
+| 2026-10-28 | Release 1.0.2: blank/DPMS, fallback de pan, versão 1.0.2, snapshots/portões, pacote e instalador verificados; push, tag e GitHub release | `Cargo.toml`, `Cargo.lock`, `install.sh`, `README.md`, `RELEASE_NOTES.md`, `docs/**`, `AGENTS.md`, `src/platform/fb.rs`, `src/app.rs` | `v1.0.2`, SHA-256 `59ecbc55…` |
 
 ## 11. Fases
 
@@ -239,22 +242,26 @@ Não registrar segredos. Não inventar progresso.
 | 2 | fbdev, console, texto, cena, captura | **concluída** |
 | 3 | fluxo completo, histórico, capturas douradas | **concluída** |
 | 4 | tema, som, a11y, desempenho | **concluída** |
-| 5 | validação em VT, pacote, docs | **concluída**; release público v1.0.1 |
+| 5 | validação em VT, pacote, docs | **concluída**; release público v1.0.2 |
 
 O escopo termina na Fase 5; não há Fase 6 nem backlog planejado (D-020).
 
 ## 12. Notas para a próxima sessão
 
-- As Fases 1–5 estão concluídas; o pacote v1.0.1 foi gerado/testado em `/tmp`
+- As Fases 1–5 estão concluídas; o pacote v1.0.2 foi gerado/testado em `/tmp`
   e o teste manual completo em VT foi reportado **OK** na 1.0.0. A release
-  `v1.0.1` inclui a correção de `yoffset`/double buffer e o `install.sh`.
+  `v1.0.2` inclui `FBIOBLANK`/`FB_BLANK_UNBLANK`, a correção de
+  `yoffset`/double buffer e o `install.sh`.
 - **Pendência de hardware:** confirmar a correção do framebuffer no segundo
-  computador; anexar driver, `virtual_size`, bpp e `fbset -i`.
+  computador; anexar driver, `virtual_size`, bpp, `blank`, `yres_virtual`,
+  `ypanstep` e `fbset -i`. A correção de blank/DPMS
+  (`FBIOBLANK`/`FB_BLANK_UNBLANK` após `KD_GRAPHICS`) foi aplicada em
+  2026-10-28 e ainda não foi validada no hardware afetado.
 - **Não há próxima fase planejada.** O escopo foi encerrado na Fase 5 (D-020);
   apenas validações técnicas opcionais permanecem.
 - **Validações opcionais:** MSRV 1.88; 24/16 bpp/resoluções alternativas;
   `SIGTERM`/`SIGHUP`/pânico observados no console; medições de CPU/latência.
-  O release público `v1.0.1` já existe; novas tags só com pedido.
+  O release público `v1.0.2` já existe; novas tags só com pedido.
 - Áudio disponível depende de ALSA/PipeWire; sem dispositivo o status fica
   “Som indisponível” e o app segue.
 - Capturas douradas: `tests/snapshots/` (16 PNGs) com `cargo test --test golden`;

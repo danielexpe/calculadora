@@ -262,7 +262,7 @@
 ## 4. Questões abertas
 
 Nenhuma questão **bloqueante** de produto. O escopo foi encerrado (D-020) e o
-release público v1.0.1 foi publicado. Validações opcionais que podem ser feitas
+release público v1.0.2 foi publicado. Validações opcionais que podem ser feitas
 sem reabrir escopo:
 
 1. 24/16 bpp e resoluções alternativas, se houver hardware/VM (D-012).

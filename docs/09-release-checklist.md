@@ -1,4 +1,4 @@
-# 09 — Checklist de release v1.0.1
+# 09 — Checklist de release v1.0.2
 
 > Não marcar itens sem execução real. Itens de hardware não validados ficam
 > como **pendentes** com a causa registrada em `docs/10-validation-log.md`.
@@ -7,10 +7,10 @@
 
 Repositório público: https://github.com/danielexpe/calculadora
 
-Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.1
+Release público: https://github.com/danielexpe/calculadora/releases/tag/v1.0.2
 
-Pacote local: `dist/calculadora-1.0.1-linux-x86_64.tar.gz`
-Hash SHA-256: `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`
+Pacote local: `dist/calculadora-1.0.2-linux-x86_64.tar.gz`
+Hash SHA-256: `59ecbc55be2543c20c4a9fe6bd9fb4f9811fa385e3a40f7021e9bf436400cbc6`
 
 ## Funcional
 
@@ -31,7 +31,7 @@ Hash SHA-256: `5f450f351dfaf23e3675b4541cae5bc90a8865f51661043d9baace4cbb5ed53f`
 - [x] `cargo fmt --all -- --check`.
 - [x] `cargo clippy --workspace --all-targets -- -D warnings`.
 - [x] `cargo clippy --workspace --all-targets --no-default-features -- -D warnings`.
-- [x] `cargo test --workspace` (195 ativos verdes; 2 auxiliares ignorados).
+- [x] `cargo test --workspace` (196 ativos verdes; 2 auxiliares ignorados).
 - [x] `cargo test --workspace --no-default-features`.
 - [x] `cargo xtask assets --check`.
 - [x] `cargo build --release`.
@@ -85,7 +85,7 @@ explicitamente pendentes abaixo.
 
 ## Release
 
-- [x] Escopo congelado; versão 1.0.1 em `Cargo.toml` e `Cargo.lock`.
+- [x] Escopo congelado; versão 1.0.2 em `Cargo.toml` e `Cargo.lock`.
 - [x] `README.md` atualizado e sem drift.
 - [x] `LICENSE` (MIT) e `LICENSE-ART` (CC BY 4.0) no pacote.
 - [x] Textos OFL das duas fontes no pacote (`licenses/`).
@@ -99,7 +99,10 @@ explicitamente pendentes abaixo.
   incluindo `--check`, instalação, captura e `--uninstall`.
 - [ ] Fix de `yoffset`/double buffer confirmado no segundo computador —
   **pendente**. Registro em `docs/10-validation-log.md` §3.6.
-- [x] Tag `v1.0.1` e GitHub release público com `tar.gz` + `.sha256`.
+- [ ] `FBIOBLANK`/`FB_BLANK_UNBLANK` confirmado no segundo computador: primeira
+  tela sem `Ctrl+C` e `blank` passando a `0` — **pendente**. Registro em
+  `docs/10-validation-log.md` §3.8.
+- [x] Tag `v1.0.2` e GitHub release público com `tar.gz` + `.sha256`.
 - [x] Hash e caminho registrados no `AGENTS.md`.
 
 ## Bloqueios conhecidos (2026-10-25)
@@ -109,12 +112,12 @@ explicitamente pendentes abaixo.
 - [x] P-03: resolvido; `rust_decimal` 1.43.0 pinada/testada.
 - [x] P-04: resolvido; fontes OFL baixadas e verificadas.
 - [ ] P-06: 24/16 bpp não confirmados — **pendente**.
-- [x] P-07: repositório público, tag `v1.0.1` e GitHub release publicados.
+- [x] P-07: repositório público, tag `v1.0.2` e GitHub release publicados.
 - [ ] MSRV 1.88 não instalada no ambiente.
 
 ## Critério de release
 
-O pacote v1.0.1 está gerado, verificado e testado isoladamente em `/tmp`;
+O pacote v1.0.2 está gerado, verificado e testado isoladamente em `/tmp`;
 o instalador foi exercitado com prefixo temporário; tag e GitHub release
 públicos foram publicados com os dois artefatos. 24/16 bpp, resoluções alternativas,
 `SIGHUP`/pânico, medições formais de CPU/latência e MSRV 1.88 permanecem

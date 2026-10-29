@@ -363,6 +363,7 @@ pub fn run_fb(cli: &Cli) -> Result<(), RunError> {
     );
 
     let console = ConsoleGuard::enter().map_err(backend)?;
+    framebuffer.unblank();
     let raw = RawModeGuard::enter().map_err(backend)?;
 
     draw(&mut framebuffer, &engine, &theme, &app, &compositor)?;

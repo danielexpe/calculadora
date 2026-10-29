@@ -11,10 +11,12 @@ use thiserror::Error;
 pub const FBIOGET_VSCREENINFO: libc::c_ulong = 0x4600;
 pub const FBIOGET_FSCREENINFO: libc::c_ulong = 0x4602;
 pub const FBIOPAN_DISPLAY: libc::c_ulong = 0x4606;
+pub const FBIOBLANK: libc::c_ulong = 0x4611;
 pub const KDGETMODE: libc::c_ulong = 0x4B3B;
 pub const KDSETMODE: libc::c_ulong = 0x4B3A;
 pub const KD_TEXT: libc::c_int = 0;
 pub const KD_GRAPHICS: libc::c_int = 1;
+pub const FB_BLANK_UNBLANK: libc::c_int = 0;
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Pod, Zeroable)]
@@ -376,7 +378,8 @@ impl Framebuffer {
         }
 
         let stride = fix.line_length as usize;
-        let visible_frame = stride * var.yres as usize;
+        let visible_rows = var.yoffset + var.yres;
+        let visible_frame = stride * visible_rows as usize;
         if (fix.smem_len as usize) < visible_frame {
             return Err(FbError::Invalid(
                 "smem_len is smaller than the visible frame",
@@ -389,11 +392,7 @@ impl Framebuffer {
             && var.yres % u32::from(fix.ypanstep) == 0
             && (fix.smem_len as usize) >= double_buffer;
 
-        let map_rows = if ypan_supported {
-            2 * var.yres
-        } else {
-            var.yoffset + var.yres
-        };
+        let map_rows = mapped_rows(var.yres, var.yoffset, ypan_supported);
         let map_len = stride * map_rows as usize;
         if map_len > fix.smem_len as usize {
             return Err(FbError::Invalid(
@@ -436,6 +435,14 @@ impl Framebuffer {
 
     pub fn info(&self) -> &FbInfo {
         &self.info
+    }
+
+    pub fn unblank(&self) {
+        // SAFETY: fd is a valid framebuffer; drivers without blanking support
+        // return an error, which is non-fatal for rendering.
+        unsafe {
+            libc::ioctl(self.fd.as_raw_fd(), FBIOBLANK, FB_BLANK_UNBLANK);
+        }
     }
 
     pub fn present(&mut self, rgba: &[u8]) -> Result<(), FbError> {
@@ -493,6 +500,15 @@ fn pan_target(current_offset: u32, height: u32) -> u32 {
         height
     } else {
         0
+    }
+}
+
+fn mapped_rows(height: u32, offset: u32, ypan_supported: bool) -> u32 {
+    let visible = offset + height;
+    if ypan_supported {
+        visible.max(2 * height)
+    } else {
+        visible
     }
 }
 
@@ -787,6 +803,15 @@ mod tests {
         assert_eq!(pan_target(0, 1080), 1080);
         assert_eq!(pan_target(1080, 1080), 0);
         assert_eq!(pan_target(360, 1080), 0);
+    }
+
+    #[test]
+    fn maps_enough_rows_for_pan_fallback() {
+        assert_eq!(mapped_rows(1080, 0, true), 2160);
+        assert_eq!(mapped_rows(1080, 1080, true), 2160);
+        assert_eq!(mapped_rows(1080, 2160, true), 3240);
+        assert_eq!(mapped_rows(1080, 2160, false), 3240);
+        assert_eq!(mapped_rows(1080, 0, false), 1080);
     }
 
     #[test]
